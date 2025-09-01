@@ -1,10 +1,10 @@
-import { Suspense } from 'react'
+import { lazy, Suspense } from 'react'
 import { Box } from '@mui/material'
 
 import { Fallback } from '@/components/Fallback/Fallback'
 import { PageBox } from '@/components/PageBox/PageBox'
 
-// const Table = lazy(() => import('@/features/table/components/DataTable/DataTable'))
+const Table = lazy(() => import('@/features/table/components/Wrapper/Wrapper'))
 
 export default function Home() {
 	return (
@@ -22,7 +22,9 @@ export default function Home() {
 				flexDirection={'column'}
 				sx={{ backgroundColor: '#fff', userSelect: 'none' }}
 			>
-				<Suspense fallback={<Fallback />}>{/* <Table /> */}</Suspense>
+				<Suspense fallback={<Fallback />}>
+					<Table />
+				</Suspense>
 			</Box>
 		</PageBox>
 	)

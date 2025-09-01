@@ -1755,6 +1755,11 @@ react-transition-group@^4.4.5:
     loose-envify "^1.4.0"
     prop-types "^15.6.2"
 
+react-window@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-2.0.2.tgz#33db244d767a1eb44783918e72c1a7daf2f6890d"
+  integrity sha512-KCDGR+5qB6hG/eDWCNZku5ERMV21vjMEDJeobqPXI0/foVDaqjf+Fsum4iJu0ftLUTxh9yvZ9t7T+SJ7woOLFw==
+
 react@^19.1.1:
   version "19.1.1"
   resolved "https://registry.yarnpkg.com/react/-/react-19.1.1.tgz#06d9149ec5e083a67f9a1e39ce97b06a03b644af"

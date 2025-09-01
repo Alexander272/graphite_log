@@ -6,6 +6,11 @@ export const API = {
 	},
 	filters: '/filters' as const,
 	sorting: '/sorting' as const,
+	realms: {
+		base: '/realms' as const,
+		user: '/realms/user' as const,
+		choose: '/realms/choose' as const,
+	},
 	users: {
 		base: '/users' as const,
 		sync: '/users/sync' as const,
