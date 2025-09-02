@@ -6,7 +6,18 @@ import (
 	"github.com/Alexander272/graphite_log/backend/pkg/mattermost"
 )
 
-type Services struct{}
+type Services struct {
+	RuleItem
+	Rule
+	Role
+	User
+	Permission
+	Session
+
+	Realm
+	Accesses
+	Graphite
+}
 
 type Deps struct {
 	Repo       *repository.Repository
@@ -16,5 +27,29 @@ type Deps struct {
 }
 
 func NewServices(deps *Deps) *Services {
-	return &Services{}
+	ruleItem := NewRuleItemService(deps.Repo.RuleItem)
+	rule := NewRuleService(deps.Repo.Rule, ruleItem)
+	role := NewRoleService(deps.Repo.Role)
+
+	permission := NewPermissionService("configs/privacy.conf", rule, role)
+	user := NewUserService(&UsersDeps{Repo: deps.Repo.Users, Keycloak: deps.Keycloak, Role: role})
+	session := NewSessionService(deps.Keycloak, user)
+
+	realm := NewRealmService(deps.Repo.Realm, user)
+	accesses := NewAccessesService(deps.Repo.Accesses)
+
+	graphite := NewGraphiteService(deps.Repo.Graphite)
+
+	return &Services{
+		RuleItem:   ruleItem,
+		Rule:       rule,
+		Role:       role,
+		User:       user,
+		Permission: permission,
+		Session:    session,
+
+		Realm:    realm,
+		Accesses: accesses,
+		Graphite: graphite,
+	}
 }

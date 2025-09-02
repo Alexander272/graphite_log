@@ -9,7 +9,7 @@ type Permission struct {
 	Method  string
 }
 
-func (m *Middleware) CheckPermissions(menuItem, method string) gin.HandlerFunc {
+func (m *Middleware) CheckPermissions(rule, method string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// u, exists := c.Get(constants.CtxUser)
 		// if !exists {
@@ -18,12 +18,12 @@ func (m *Middleware) CheckPermissions(menuItem, method string) gin.HandlerFunc {
 		// }
 		// role := u.(models.User).Role
 
-		// access, err := m.services.Permission.Enforce(role, menuItem, method)
+		// access, err := m.services.Permission.Enforce(role, rule, method)
 		// if err != nil {
 		// 	response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		// 	return
 		// }
-		// logger.Debug("permissions", logger.StringAttr("menu", menuItem), logger.StringAttr("method", method), logger.BoolAttr("access", access))
+		// logger.Debug("permissions", logger.StringAttr("rule", rule), logger.StringAttr("method", method), logger.BoolAttr("access", access))
 
 		// if !access {
 		// 	response.NewErrorResponse(c, http.StatusForbidden, "access denied", "нет доступа к данному разделу")
