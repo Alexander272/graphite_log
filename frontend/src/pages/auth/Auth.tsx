@@ -6,7 +6,7 @@ import { useAppSelector } from '@/hooks/redux'
 import { getToken } from '@/features/user/userSlice'
 import { SignInForm } from '@/features/auth/components/SignInForm'
 import { PageBox } from '@/components/PageBox/PageBox'
-import { PenIcon } from './PenIcon'
+import { PenIcon } from '@/components/Icons/PenIcon'
 
 type LocationState = {
 	from?: Location
@@ -39,7 +39,9 @@ export default function Auth() {
 					fontWeight={'bold'}
 					// fontFamily={'serif'}
 				>
-					ГрафитЛог <PenIcon fontSize={'inherit'} />
+					ГрафитЛог
+					{/* <PenIcon fontSize={'inherit'} /> */}
+					<PenIcon fontSize={'inherit'} fill={'#042245'} />
 				</Typography>
 
 				<Box

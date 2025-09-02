@@ -1,43 +1,38 @@
-import { List } from 'react-window'
+import { useRef, type FC } from 'react'
+import { List, type ListImperativeAPI } from 'react-window'
 
-import type { ITableItem } from '../../types/item'
 import { MaxSize, RowHeight, Size } from '../../constants/defaultValues'
 import { useAppSelector } from '@/hooks/redux'
+import { useGetTableItems } from '../../hooks/getTableItems'
+import { getTableSize } from '../../tableSlice'
 import { TableBody } from '@/components/Table/TableBody'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
-import { getTableSize } from '../../tableSlice'
 import { NoRowsOverlay } from '../NoRowsOverlay/components/NoRowsOverlay'
 import { Row } from './Row'
 
-export const Body = () => {
-	// const section = useAppSelector(getSection)
+type Props = unknown
+
+export const Body: FC<Props> = () => {
+	const listRef = useRef<ListImperativeAPI>(null)
 	const size = useAppSelector(getTableSize)
 
-	// const { data, isFetching, isLoading } = useGetSI()
-	const data = { data: [], total: 0 } as { data: ITableItem[]; total: number }
-	const isFetching = false
-	const isLoading = false
-
-	// const { width } = useCalcWidth(Columns)
+	const { data, isFetching, isLoading } = useGetTableItems()
 
 	if (!isLoading && !data?.total) return <NoRowsOverlay />
 	return (
-		<TableBody>
+		<TableBody height={RowHeight * (size > Size ? MaxSize : Size) + 'px'}>
 			{isFetching || isLoading ? <BoxFallback /> : null}
 
 			{data && (
 				<List
+					listRef={listRef}
 					overscanCount={10}
-					rowHeight={RowHeight * (size > Size ? MaxSize : Size)}
+					rowHeight={RowHeight}
 					rowCount={data.data.length > (size || Size) ? size || Size : data.data.length}
-					// itemSize={RowHeight}
-					// width={width}
 					rowComponent={Row}
-					// rowComponent={({ index, style, data }) => <Row index={index} style={style} data={data} />}
 					rowProps={{ data: data.data || [] }}
+					// style={{ overflow: 'initial' }}
 				/>
-				// 	{({ index, style }) => <Row item={data.data[index]} sx={style} />}
-				// </List>
 			)}
 		</TableBody>
 	)

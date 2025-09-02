@@ -23,6 +23,7 @@ export const DateField: FC<Props> = ({ data }) => {
 					{...field}
 					value={dayjs(field.value)}
 					onChange={value => {
+						//TODO timezone скидывается
 						field.onChange(value?.startOf('d').toISOString())
 					}}
 					label={data.label}

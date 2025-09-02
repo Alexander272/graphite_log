@@ -1,4 +1,4 @@
-import type { JSX } from 'react'
+import { memo, type FC, type JSX } from 'react'
 
 import type { IColumn } from '../../types/table'
 import { Columns } from '../../constants/columns'
@@ -14,7 +14,17 @@ import { CellText } from '@/components/CellText/CellText'
 import { Badge } from '@/components/Badge/Badge'
 import { SortUpIcon } from '@/components/Icons/SortUpIcon'
 
-export const Head = () => {
+type Props = unknown
+
+export const Head: FC<Props> = () => {
+	return (
+		<TableHead>
+			<Row />
+		</TableHead>
+	)
+}
+
+const Row = memo(() => {
 	const sort = useAppSelector(getSort)
 	// const hidden = useAppSelector(getHidden)
 
@@ -89,12 +99,9 @@ export const Head = () => {
 		return header
 	}
 
-	// if (isFetching) return <Fallback />
 	return (
-		<TableHead>
-			<TableRow width={width} height={height} sx={{ padding: '0 6px' }}>
-				{renderHeader()}
-			</TableRow>
-		</TableHead>
+		<TableRow width={width} height={height} sx={{ padding: '0 6px' }}>
+			{renderHeader()}
+		</TableRow>
 	)
-}
+})

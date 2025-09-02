@@ -2,11 +2,11 @@ import { type FC } from 'react'
 import { Autocomplete, TextField } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
 
-import type { Field, Option } from './type'
+import type { Field } from './type'
 
 type Props = {
 	data: Field
-	options: Option[]
+	options: string[]
 	isLoading?: boolean
 	onFocus?: () => void
 }

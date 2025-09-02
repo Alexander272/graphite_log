@@ -9,6 +9,7 @@ import { getToken } from '@/features/user/userSlice'
 import { NavButton } from './header.style'
 
 import logo from '@/assets/logo.webp'
+import { PenIcon } from '../Icons/PenIcon'
 
 export const LayoutHeader = () => {
 	const [signOut] = useSignOutMutation()
@@ -24,6 +25,7 @@ export const LayoutHeader = () => {
 			<Toolbar sx={{ justifyContent: 'space-between', alignItems: 'inherit' }}>
 				<Box alignSelf={'center'} display={'flex'} alignItems={'center'} component={Link} to={AppRoutes.Home}>
 					<img height={46} width={157} src={logo} alt='logo' />
+					<PenIcon fontSize={'26px'} fill={'#042245'} />
 					{/* <GeometryIcon fill={'#042245'} /> */}
 				</Box>
 

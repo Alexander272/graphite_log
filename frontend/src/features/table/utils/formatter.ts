@@ -10,7 +10,7 @@ export const Formatter: Formatter = (type, value) => {
 
 	switch (type) {
 		case 'date':
-			return dayjs((value as number) * 1000).format(DayjsFormat)
+			return dayjs(value as string).format(DayjsFormat)
 		// case 'number':
 		// 	return new Intl.NumberFormat('ru').format((value as number) || 0)
 

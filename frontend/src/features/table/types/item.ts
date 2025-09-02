@@ -1,3 +1,14 @@
+import type { IFilter, ISearch, ISort } from './params'
+
+export interface IGetTableItemDTO {
+	realmId: string
+	page?: number
+	size?: number
+	sort?: ISort
+	search?: ISearch
+	filters?: IFilter[]
+}
+
 export interface ITableItem {
 	id: string
 	dateOfReceipt: string
@@ -20,6 +31,8 @@ export interface ITableItem {
 }
 
 export interface ITableItemDTO {
+	id?: string
+	realmId?: string
 	dateOfReceipt: string
 	name: string
 	erpName: string
@@ -33,4 +46,9 @@ export interface ITableItemDTO {
 	act: string
 	productionDate: string
 	notes: string
+}
+
+export interface ISetPurposeDTO {
+	id: string
+	purpose: string
 }

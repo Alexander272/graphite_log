@@ -51,7 +51,7 @@ type CellProps = {
 	isActive?: boolean
 }
 export const TableCellContainer = styled.div<CellProps>`
-	width: ${props => (props.width ? props.width + 'px' : '100%')};
+	min-width: ${props => (props.width ? props.width + 'px' : '100%')};
 	position: relative;
 	border-bottom: 1px solid #e0e0e0;
 	cursor: ${props => props.isActive && 'pointer'};
@@ -78,16 +78,24 @@ export const TableCellContainer = styled.div<CellProps>`
 	}
 `
 
-export const TableHeadContainer = styled.div`
+export const TableHeadContainer = styled.div<{ scrollLeft?: number }>`
 	background: #f5f5f5;
 	border-radius: 12px;
 	width: fit-content;
+	transform: ${props => props.scrollLeft && `translateX(-${props.scrollLeft}px)`};
 	/* background-color: #f3f4f8;
 	border-radius: 18px;
 	width: fit-content; */
 `
 
-export const TableBodyContainer = styled.div``
+export const TableBodyContainer = styled.div<{ height?: string }>`
+	height: ${props => props.height && props.height};
+	display: flex;
+	flex-direction: column;
+	& > :first-of-type {
+		overflow: inherit !important;
+	}
+`
 
 type TableProps = {
 	columnWidth?: number | number[]

@@ -4,6 +4,13 @@ export const API = {
 		refresh: `auth/refresh` as const,
 		signOut: `auth/sign-out` as const,
 	},
+	table: {
+		base: '/graphite' as const,
+		unique: '/graphite/unique' as const,
+		purpose: (id: string) => `/graphite/${id}/purpose` as const,
+		place: (id: string) => `/graphite/${id}/place` as const,
+		notes: (id: string) => `/graphite/${id}/notes` as const,
+	},
 	filters: '/filters' as const,
 	sorting: '/sorting' as const,
 	realms: {

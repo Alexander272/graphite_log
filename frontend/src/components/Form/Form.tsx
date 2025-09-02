@@ -4,17 +4,16 @@ import type { Field, Option } from './type'
 import { TextField } from './TextField'
 import { NumberField } from './NumberField'
 import { DateField } from './DateField'
-import { AutocompleteField } from './AutocompleteField'
 import { SelectField } from './SelectField'
 
 type Props = {
 	item: Field
 	options?: Option[]
-	isLoading?: boolean
-	onFocus?: () => void
+	// isLoading?: boolean
+	// onFocus?: () => void
 }
 
-export const FormField: FC<Props> = ({ item, options, isLoading, onFocus }) => {
+export const FormField: FC<Props> = ({ item, options }) => {
 	switch (item.type) {
 		case 'text':
 			return <TextField key={item.name} data={item} />
@@ -28,16 +27,16 @@ export const FormField: FC<Props> = ({ item, options, isLoading, onFocus }) => {
 		// 	return <FileField key={item.id} data={item} instrumentId={instrumentId} />
 		case 'list':
 			return <SelectField key={item.name} data={item} options={options || []} />
-		case 'autocomplete':
-			return (
-				<AutocompleteField
-					key={item.name}
-					data={item}
-					options={options || []}
-					isLoading={isLoading}
-					onFocus={onFocus}
-				/>
-			)
+		// case 'autocomplete':
+		// 	return (
+		// 		<AutocompleteField
+		// 			key={item.name}
+		// 			data={item}
+		// 			options={options || []}
+		// 			isLoading={isLoading}
+		// 			onFocus={onFocus}
+		// 		/>
+		// 	)
 		default:
 			return null
 	}

@@ -7,12 +7,11 @@ import { AppRoutes } from './routes'
 
 // проверка авторизации пользователя
 export default function PrivateRoute() {
-	//TODO
-	// const token = useAppSelector(getToken)
-	// const permissions = useAppSelector(getPermissions)
-	// const location = useLocation()
+	const token = useAppSelector(getToken)
+	const permissions = useAppSelector(getPermissions)
+	const location = useLocation()
 
-	// if (!token) return <Navigate to={AppRoutes.Auth} state={{ from: location }} />
+	if (!token) return <Navigate to={AppRoutes.Auth} state={{ from: location }} />
 	// if (!permissions || !permissions.length) return <Forbidden />
 
 	return <Outlet />

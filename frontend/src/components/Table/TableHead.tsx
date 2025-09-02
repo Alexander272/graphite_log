@@ -1,7 +1,11 @@
-import { FC, PropsWithChildren } from 'react'
+import type { FC, PropsWithChildren } from 'react'
 
 import { TableHeadContainer } from './style'
 
-export const TableHead: FC<PropsWithChildren> = ({ children }) => {
-	return <TableHeadContainer>{children}</TableHeadContainer>
+type Props = {
+	scrollLeft?: number
+}
+
+export const TableHead: FC<PropsWithChildren<Props>> = ({ children, scrollLeft }) => {
+	return <TableHeadContainer scrollLeft={scrollLeft}>{children}</TableHeadContainer>
 }

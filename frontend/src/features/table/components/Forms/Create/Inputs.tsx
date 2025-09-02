@@ -1,10 +1,13 @@
 import { useState, type FC } from 'react'
+import { Stack } from '@mui/material'
+import { useAppSelector } from '@/hooks/redux'
 
-import type { Field, Option } from '@/components/Form/type'
+import type { Field } from '@/components/Form/type'
+import { useLazyGetUniqueDataQuery } from '@/features/table/tableApiSlice'
+import { getRealm } from '@/features/realms/realmSlice'
 import { FormField } from '@/components/Form/Form'
 import { AutocompleteField } from '@/components/Form/AutocompleteField'
 import { Fields } from './fields'
-import { Stack } from '@mui/material'
 
 export const Inputs = () => {
 	return (
@@ -19,18 +22,18 @@ export const Inputs = () => {
 			})}
 		</Stack>
 	)
-
-	// return <div>Inputs</div>
 }
 
 const AutocompleteInput: FC<{ field: Field }> = ({ field }) => {
-	const [options, setOptions] = useState<Option[]>([])
+	const [options, setOptions] = useState<string[]>([])
+	const realm = useAppSelector(getRealm)
 
-	//TODO get values
-	const isLoading = false
-	const onFocus = () => {
-		setOptions([])
+	const [get, { isFetching }] = useLazyGetUniqueDataQuery()
+
+	const onFocus = async () => {
+		const payload = await get({ field: field.name, realm: realm?.id || '' }).unwrap()
+		setOptions(payload?.data || [])
 	}
 
-	return <AutocompleteField data={field} options={options || []} isLoading={isLoading} onFocus={onFocus} />
+	return <AutocompleteField data={field} options={options || []} isLoading={isFetching} onFocus={onFocus} />
 }
