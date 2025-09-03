@@ -1,11 +1,10 @@
 import { memo, type FC, type JSX } from 'react'
 
 import type { IColumn } from '../../types/table'
-import { Columns } from '../../constants/columns'
 import { ColWidth, RowHeight } from '../../constants/defaultValues'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { useCalcWidth } from '../../utils/calcWidth'
-import { getSort, setSort } from '../../tableSlice'
+import { getColumns, getSort, setSort } from '../../tableSlice'
 import { TableGroup } from '@/components/Table/TableGroup'
 import { TableHead } from '@/components/Table/TableHead'
 import { TableRow } from '@/components/Table/TableRow'
@@ -26,9 +25,10 @@ export const Head: FC<Props> = () => {
 
 const Row = memo(() => {
 	const sort = useAppSelector(getSort)
+	const columns = useAppSelector(getColumns)
 	// const hidden = useAppSelector(getHidden)
 
-	const { width, hasFewRows } = useCalcWidth(Columns)
+	const { width, hasFewRows } = useCalcWidth(columns)
 	const height = (hasFewRows ? 2 : 1) * RowHeight
 
 	const dispatch = useAppDispatch()
@@ -66,7 +66,7 @@ const Row = memo(() => {
 	const renderHeader = () => {
 		const header: JSX.Element[] = []
 
-		Columns.forEach(c => {
+		columns.forEach(c => {
 			if (c.children && !c?.hidden) {
 				let width = 0
 				const subhead: JSX.Element[] = []

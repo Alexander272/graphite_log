@@ -3,10 +3,9 @@ import type { RowComponentProps } from 'react-window'
 
 import type { IColumn } from '../../types/table'
 import type { ITableItem } from '../../types/item'
-import { Columns } from '../../constants/columns'
 import { Formatter } from '../../utils/formatter'
-import { useAppDispatch } from '@/hooks/redux'
-import { setContextMenu, setSelected } from '../../tableSlice'
+import { useAppDispatch, useAppSelector } from '@/hooks/redux'
+import { getColumns, setContextMenu, setSelected } from '../../tableSlice'
 import { TableRow } from '@/components/Table/TableRow'
 import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
@@ -19,6 +18,7 @@ import { CellText } from '@/components/CellText/CellText'
 export const Row = ({ index, style, data }: RowComponentProps<{ data: ITableItem[] }>) => {
 	const item = data[index]
 
+	const columns = useAppSelector(getColumns)
 	const dispatch = useAppDispatch()
 
 	const selectHandler = () => {
@@ -41,7 +41,7 @@ export const Row = ({ index, style, data }: RowComponentProps<{ data: ITableItem
 			hover
 			sx={{ padding: '0 6px', ...style, width: 'fit-content' }}
 		>
-			{Columns.map(c => {
+			{columns.map(c => {
 				if (c?.hidden) return null
 				if (c.children) {
 					return c.children.map(c => {

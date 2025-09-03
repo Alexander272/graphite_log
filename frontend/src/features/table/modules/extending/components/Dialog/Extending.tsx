@@ -4,27 +4,27 @@ import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { changeDialogIsOpen, getDialogState } from '@/features/dialog/dialogSlice'
 import { Dialog } from '@/features/dialog/components/Dialog'
 import { TimesIcon } from '@/components/Icons/TimesIcon'
-import { SetPurpose } from '../Forms/SetPurpose/SetPurpose'
+import { Extending } from '../Forms/Extending'
 
 type Context = string
 
-export const SetPurposeDialog = () => {
-	const modal = useAppSelector(getDialogState('SetPurpose'))
+export const ExtendingDialog = () => {
+	const modal = useAppSelector(getDialogState('AddExtending'))
 	const dispatch = useAppDispatch()
 
 	const closeHandler = () => {
-		dispatch(changeDialogIsOpen({ variant: 'SetPurpose', isOpen: false }))
+		dispatch(changeDialogIsOpen({ variant: 'AddExtending', isOpen: false }))
 	}
 
 	return (
 		<Dialog
-			title={'Задать назначение'}
+			title={'Продление срока годности'}
 			headerActions={
 				<IconButton onClick={closeHandler} size='large' sx={{ fill: '#505050', mr: 2 }}>
 					<TimesIcon fontSize={12} />
 				</IconButton>
 			}
-			body={<SetPurpose id={(modal?.context as Context) || ''} />}
+			body={<Extending id={(modal?.context as Context) || ''} />}
 			open={modal?.isOpen || false}
 			onClose={closeHandler}
 			maxWidth='sm'

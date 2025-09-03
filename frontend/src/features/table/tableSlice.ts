@@ -2,9 +2,10 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 import type { RootState } from '@/app/store'
 import type { IFilter, ISearch, ISort } from './types/params'
-import type { IContextMenu, ISelect } from './types/table'
+import type { IColumn, IContextMenu, ISelect } from './types/table'
 import { Size } from './constants/defaultValues'
 import { localKeys } from './constants/storage'
+import { Columns } from './constants/columns'
 
 interface ITableSlice {
 	page: number
@@ -14,19 +15,20 @@ interface ITableSlice {
 	search: ISearch
 	selected: ISelect
 	contextMenu?: IContextMenu
+	columns: IColumn[]
 }
 
 const initialState: ITableSlice = {
 	page: +(localStorage.getItem(localKeys.page) || 1),
 	size: +(localStorage.getItem(localKeys.size) || Size),
-	sort: {},
-	filters: [],
+	sort: JSON.parse(localStorage.getItem(localKeys.sort) || '{}'),
+	filters: JSON.parse(localStorage.getItem(localKeys.filter) || '[]'),
 	search: {
 		value: '',
-		fields: ['name', 'factoryNumber'],
+		fields: ['name', 'erpName', 'supplierBatch', 'bigBagNumber', 'regNumber'],
 	},
 	selected: {},
-	// hidden: JSON.parse(localStorage.getItem(localKeys.hidden) || '{}'),
+	columns: JSON.parse(localStorage.getItem(localKeys.columns) || 'null') || Columns,
 }
 
 const tableSlice = createSlice({
@@ -45,6 +47,7 @@ const tableSlice = createSlice({
 		setSort: (state, action: PayloadAction<string>) => {
 			if (!state.sort[action.payload]) {
 				state.sort = { ...(state.sort || {}), [action.payload]: 'ASC' }
+				localStorage.setItem(localKeys.sort, JSON.stringify(state.sort))
 				return
 			}
 
@@ -52,12 +55,14 @@ const tableSlice = createSlice({
 			else {
 				delete state.sort[action.payload]
 			}
+			localStorage.setItem(localKeys.sort, JSON.stringify(state.sort))
 		},
 
 		setFilters: (state, action: PayloadAction<IFilter[]>) => {
 			state.filters = action.payload
 			state.page = 1
 			state.selected = {}
+			localStorage.setItem(localKeys.filter, JSON.stringify(state.filters))
 		},
 
 		setSearch: (state, action: PayloadAction<string>) => {
@@ -84,6 +89,11 @@ const tableSlice = createSlice({
 			state.contextMenu = action.payload
 		},
 
+		setColumns: (state, action: PayloadAction<IColumn[]>) => {
+			state.columns = action.payload
+			localStorage.setItem(localKeys.columns, JSON.stringify(state.columns))
+		},
+
 		resetTable: () => {
 			localStorage.removeItem(localKeys.page)
 			return initialState
@@ -98,6 +108,7 @@ export const getFilters = (state: RootState) => state.table.filters
 export const getSearch = (state: RootState) => state.table.search
 export const getSelected = (state: RootState) => state.table.selected
 export const getContextMenu = (state: RootState) => state.table.contextMenu
+export const getColumns = (state: RootState) => state.table.columns
 
 export const tablePath = tableSlice.name
 export const tableReducer = tableSlice.reducer
@@ -111,5 +122,6 @@ export const {
 	setSearchFields,
 	setSelected,
 	setContextMenu,
+	setColumns,
 	resetTable,
 } = tableSlice.actions

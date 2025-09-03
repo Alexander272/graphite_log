@@ -11,6 +11,8 @@ export const API = {
 		place: (id: string) => `/graphite/${id}/place` as const,
 		notes: (id: string) => `/graphite/${id}/notes` as const,
 	},
+	extending: '/extending' as const,
+	issuance: '/issuance' as const,
 	filters: '/filters' as const,
 	sorting: '/sorting' as const,
 	realms: {

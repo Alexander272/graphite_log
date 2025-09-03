@@ -1,50 +1,53 @@
 import type { FC } from 'react'
-import { Button, Divider, Stack, TextField, Typography } from '@mui/material'
-import { Controller, useForm } from 'react-hook-form'
+import { Button, Divider, Stack, Typography } from '@mui/material'
+import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
+import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
-import type { ISetNotesDTO } from '@/features/table/types/item'
+import type { IIssuanceDTO } from '../../types/issuance'
 import { useAppDispatch } from '@/hooks/redux'
+import { useGetTableItemByIdQuery } from '@/features/table/tableApiSlice'
+import { useCreateIssuanceMutation } from '../../issuanceApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
-import { useGetTableItemByIdQuery, useSetNotesMutation } from '@/features/table/tableApiSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
+import { Inputs } from './Inputs'
 
 type Props = {
 	id: string
 }
 
-const defaultValues: ISetNotesDTO = {
+const defaultValues: IIssuanceDTO = {
 	id: '',
-	notes: '',
+	graphiteId: '',
+	issuanceDate: dayjs().toISOString(),
+	isFull: true,
+	isNotFull: false,
+	amount: 0,
 }
 
-export const SetNotes: FC<Props> = ({ id }) => {
+export const Issuance: FC<Props> = ({ id }) => {
 	const dispatch = useAppDispatch()
 
-	const [setNotes, { isLoading }] = useSetNotesMutation()
-	const { data, isFetching } = useGetTableItemByIdQuery(id, { skip: !id })
-
-	const {
-		control,
-		handleSubmit,
-		formState: { dirtyFields },
-	} = useForm<ISetNotesDTO>({
-		values: { ...defaultValues, notes: data?.data.notes || '' },
+	const methods = useForm<IIssuanceDTO>({
+		values: defaultValues,
 	})
 
+	const [create, { isLoading }] = useCreateIssuanceMutation()
+	const { data, isFetching } = useGetTableItemByIdQuery(id, { skip: !id })
+
 	const closeHandler = () => {
-		dispatch(changeDialogIsOpen({ variant: 'SetNotes', isOpen: false }))
+		dispatch(changeDialogIsOpen({ variant: 'AddIssuance', isOpen: false }))
 	}
 
-	const submitHandler = handleSubmit(async form => {
-		console.log('save', form, dirtyFields)
+	const submitHandler = methods.handleSubmit(async form => {
+		console.log('save', form, methods.formState.dirtyFields)
 
-		form.id = id
-		form.notes = form.notes.trim()
+		form.graphiteId = id
+		form.isFull = !form.isNotFull
 
 		try {
-			await setNotes(form).unwrap()
+			await create(form).unwrap()
 			closeHandler()
 		} catch (error) {
 			toast.error((error as IFetchError).data.message, { autoClose: false })
@@ -65,21 +68,9 @@ export const SetNotes: FC<Props> = ({ id }) => {
 			</Stack>
 
 			<Stack component={'form'} onSubmit={submitHandler}>
-				<Controller
-					control={control}
-					name={'notes'}
-					rules={{ required: true }}
-					render={({ field, fieldState: { error } }) => (
-						<TextField
-							{...field}
-							value={field.value || ''}
-							label={'Изменить примечание'}
-							fullWidth
-							error={Boolean(error)}
-							multiline
-						/>
-					)}
-				/>
+				<FormProvider {...methods}>
+					<Inputs />
+				</FormProvider>
 
 				<Divider sx={{ width: '50%', alignSelf: 'center', mt: 3 }} />
 				<Stack direction={'row'} spacing={3} mt={3}>

@@ -8,6 +8,8 @@ import { EditDocIcon } from '@/components/Icons/EditDoc'
 import { ExchangeIcon } from '@/components/Icons/ExchangeIcon'
 import { OperationIcon } from '@/components/Icons/OperationIcon'
 import { IntegrationIcon } from '@/components/Icons/IntegrationIcon'
+import { ExtendingDialog } from '../../modules/extending/components/Dialog/Extending'
+import { IssuanceDialog } from '../../modules/issuance/components/Dialog/Issuance'
 import { SetPurposeDialog } from '../Dialogs/SetPurpose'
 import { SetPlaceDialog } from '../Dialogs/SetPlace'
 import { SetNotesDialog } from '../Dialogs/SetNotes'
@@ -44,7 +46,7 @@ export const ContextMenu = () => {
 					</ListItemIcon>
 					Задать назначение
 				</MenuItem>
-				<MenuItem onClick={contextHandler('AddRelease')}>
+				<MenuItem onClick={contextHandler('AddIssuance')}>
 					<ListItemIcon>
 						<IntegrationIcon fontSize={20} fill={'#363636'} />
 					</ListItemIcon>
@@ -73,6 +75,8 @@ export const ContextMenu = () => {
 			<SetPurposeDialog />
 			<SetPlaceDialog />
 			<SetNotesDialog />
+			<ExtendingDialog />
+			<IssuanceDialog />
 		</>
 	)
 }

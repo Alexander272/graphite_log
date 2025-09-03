@@ -6,6 +6,8 @@ import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { ActiveRealm } from '@/features/realms/components/ActiveRealm'
 import { PlusIcon } from '@/components/Icons/PlusIcon'
 import { CreateDialog } from '../Dialogs/Create'
+import { Search } from '../Search/Search'
+import { Setting } from '../Setting/SettingLazy'
 
 export const Header = () => {
 	const { palette } = useTheme()
@@ -17,7 +19,7 @@ export const Header = () => {
 
 	return (
 		<Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'} mt={1} mb={0.5} mx={2}>
-			<Stack direction={'row'} spacing={1}>
+			<Stack direction={'row'} spacing={1} flexBasis={'20%'}>
 				<ActiveRealm />
 
 				{/* {useCheckPermission(PermRules.SI.Write) ? ( */}
@@ -28,14 +30,11 @@ export const Header = () => {
 				{/* ) : null} */}
 			</Stack>
 
-			{/* <Search /> */}
+			<Search />
 
-			<Stack direction={'row'} spacing={2}>
-				{/* <Setting />
-				<FastSelect />
-				<Filters />
-
-				<ToolsMenu /> */}
+			<Stack direction={'row'} spacing={2} flexBasis={'20%'} justifyContent={'flex-end'}>
+				<Setting />
+				{/* <Filters /> */}
 			</Stack>
 
 			<CreateDialog />

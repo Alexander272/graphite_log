@@ -1,12 +1,12 @@
 import type { FC } from 'react'
-import { Autocomplete, Button, Divider, Stack, TextField } from '@mui/material'
+import { Autocomplete, Button, Divider, Stack, TextField, Typography } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 
 import type { IFetchError } from '@/app/types/error'
 import type { ISetPurposeDTO } from '@/features/table/types/item'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
-import { useGetUniqueDataQuery, useSetPurposeMutation } from '@/features/table/tableApiSlice'
+import { useGetTableItemByIdQuery, useGetUniqueDataQuery, useSetPurposeMutation } from '@/features/table/tableApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { getRealm } from '@/features/realms/realmSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
@@ -28,6 +28,7 @@ export const SetPurpose: FC<Props> = ({ id }) => {
 		{ field: 'purpose', realm: realm?.id || '' },
 		{ skip: !realm?.id }
 	)
+	const { data: orig, isFetching: isFetchingOrig } = useGetTableItemByIdQuery(id, { skip: !id })
 	const [setPurpose, { isLoading }] = useSetPurposeMutation()
 
 	const {
@@ -35,7 +36,7 @@ export const SetPurpose: FC<Props> = ({ id }) => {
 		handleSubmit,
 		formState: { dirtyFields },
 	} = useForm<ISetPurposeDTO>({
-		values: defaultValues,
+		values: { ...defaultValues, purpose: orig?.data.purpose || '' },
 	})
 
 	const closeHandler = () => {
@@ -57,8 +58,17 @@ export const SetPurpose: FC<Props> = ({ id }) => {
 	})
 
 	return (
-		<Stack mt={-1.5} position={'relative'}>
-			{isLoading ? <BoxFallback /> : null}
+		<Stack mt={-2.5} position={'relative'}>
+			{isLoading || isFetchingOrig ? <BoxFallback /> : null}
+
+			<Stack mb={3}>
+				<Typography fontSize={'1.4rem'} textAlign={'center'}>
+					{orig?.data.name}
+				</Typography>
+				<Typography textAlign={'center'}>
+					{orig?.data.regNumber ? `Регистрационный №: ${orig?.data.regNumber}` : null}
+				</Typography>
+			</Stack>
 
 			<Stack component={'form'} onSubmit={submitHandler}>
 				{/* <Controller

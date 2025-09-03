@@ -1,12 +1,12 @@
 import type { FC } from 'react'
-import { Autocomplete, Button, Divider, Stack, TextField } from '@mui/material'
+import { Autocomplete, Button, Divider, Stack, TextField, Typography } from '@mui/material'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
 
 import type { IFetchError } from '@/app/types/error'
 import type { ISetPlaceDTO } from '@/features/table/types/item'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
-import { useGetUniqueDataQuery, useSetPlaceMutation } from '@/features/table/tableApiSlice'
+import { useGetTableItemByIdQuery, useGetUniqueDataQuery, useSetPlaceMutation } from '@/features/table/tableApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { getRealm } from '@/features/realms/realmSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
@@ -25,6 +25,7 @@ export const SetPlace: FC<Props> = ({ id }) => {
 	const dispatch = useAppDispatch()
 
 	const { data, isFetching } = useGetUniqueDataQuery({ field: 'place', realm: realm?.id || '' }, { skip: !realm?.id })
+	const { data: orig, isFetching: isFetchingOrig } = useGetTableItemByIdQuery(id, { skip: !id })
 	const [setPlace, { isLoading }] = useSetPlaceMutation()
 
 	const {
@@ -32,7 +33,7 @@ export const SetPlace: FC<Props> = ({ id }) => {
 		handleSubmit,
 		formState: { dirtyFields },
 	} = useForm<ISetPlaceDTO>({
-		values: defaultValues,
+		values: { ...defaultValues, place: orig?.data.place || '' },
 	})
 
 	const closeHandler = () => {
@@ -54,8 +55,17 @@ export const SetPlace: FC<Props> = ({ id }) => {
 	})
 
 	return (
-		<Stack mt={-1.5} position={'relative'}>
-			{isLoading ? <BoxFallback /> : null}
+		<Stack mt={-2.5} position={'relative'}>
+			{isLoading || isFetchingOrig ? <BoxFallback /> : null}
+
+			<Stack mb={3}>
+				<Typography fontSize={'1.4rem'} textAlign={'center'}>
+					{orig?.data.name}
+				</Typography>
+				<Typography textAlign={'center'}>
+					{orig?.data.regNumber ? `Регистрационный №: ${orig?.data.regNumber}` : null}
+				</Typography>
+			</Stack>
 
 			<Stack component={'form'} onSubmit={submitHandler}>
 				<Controller

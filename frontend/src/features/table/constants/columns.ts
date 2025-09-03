@@ -75,7 +75,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 	},
 	{
 		id: crypto.randomUUID(),
-		field: 'markOnRelease',
+		field: 'issuanceForProd',
 		name: 'Отметка о выдаче в производство',
 		type: 'text',
 		width: 150,

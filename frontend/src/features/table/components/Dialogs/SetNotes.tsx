@@ -20,7 +20,7 @@ export const SetNotesDialog = () => {
 		<Dialog
 			title={'Изменить примечание'}
 			headerActions={
-				<IconButton onClick={closeHandler} size='large' sx={{ fill: '#505050', width: 42 }}>
+				<IconButton onClick={closeHandler} size='large' sx={{ fill: '#505050', mr: 2 }}>
 					<TimesIcon fontSize={12} />
 				</IconButton>
 			}

@@ -8,7 +8,7 @@ export type DialogVariants =
 	| 'AddExtending'
 	| 'SetPlace'
 	| 'SetNotes'
-	| 'AddRelease'
+	| 'AddIssuance'
 	| 'Access'
 	| 'History'
 

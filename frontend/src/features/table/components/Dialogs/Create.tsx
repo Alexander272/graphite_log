@@ -33,12 +33,12 @@ export const CreateDialog = () => {
 					{localStorage.getItem(localKeys.form) && (
 						<Tooltip title='Очистить'>
 							<IconButton onClick={resetHandler} size='large' sx={{ fill: '#505050' }}>
-								<RefreshIcon fontSize={18} />
+								<RefreshIcon fontSize={16} />
 							</IconButton>
 						</Tooltip>
 					)}
 
-					<IconButton onClick={closeHandler} size='large' sx={{ fill: '#505050', width: 42 }}>
+					<IconButton onClick={closeHandler} size='large' sx={{ fill: '#505050', width: 40 }}>
 						<TimesIcon fontSize={12} />
 					</IconButton>
 				</Stack>
