@@ -7,8 +7,11 @@ import { ClockIcon } from '@/components/Icons/ClockIcon'
 import { EditDocIcon } from '@/components/Icons/EditDoc'
 import { ExchangeIcon } from '@/components/Icons/ExchangeIcon'
 import { OperationIcon } from '@/components/Icons/OperationIcon'
-import { CreateOnBase } from './CreateOnBase'
+import { IntegrationIcon } from '@/components/Icons/IntegrationIcon'
 import { SetPurposeDialog } from '../Dialogs/SetPurpose'
+import { SetPlaceDialog } from '../Dialogs/SetPlace'
+import { SetNotesDialog } from '../Dialogs/SetNotes'
+import { CreateOnBase } from './CreateOnBase'
 
 export const ContextMenu = () => {
 	const contextMenu = useAppSelector(getContextMenu)
@@ -41,6 +44,12 @@ export const ContextMenu = () => {
 					</ListItemIcon>
 					Задать назначение
 				</MenuItem>
+				<MenuItem onClick={contextHandler('AddRelease')}>
+					<ListItemIcon>
+						<IntegrationIcon fontSize={20} fill={'#363636'} />
+					</ListItemIcon>
+					Выдать в производство
+				</MenuItem>
 				<MenuItem onClick={contextHandler('AddExtending')}>
 					<ListItemIcon>
 						<ClockIcon fontSize={18} fill={'#363636'} />
@@ -62,6 +71,8 @@ export const ContextMenu = () => {
 			</Menu>
 
 			<SetPurposeDialog />
+			<SetPlaceDialog />
+			<SetNotesDialog />
 		</>
 	)
 }

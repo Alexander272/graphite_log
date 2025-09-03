@@ -35,7 +35,12 @@ export const Row = ({ index, style, data }: RowComponentProps<{ data: ITableItem
 	}
 
 	return (
-		<TableRow onClick={selectHandler} onContext={contextHandler} hover sx={{ padding: '0 6px', ...style }}>
+		<TableRow
+			onClick={selectHandler}
+			onContext={contextHandler}
+			hover
+			sx={{ padding: '0 6px', ...style, width: 'fit-content' }}
+		>
 			{Columns.map(c => {
 				if (c?.hidden) return null
 				if (c.children) {

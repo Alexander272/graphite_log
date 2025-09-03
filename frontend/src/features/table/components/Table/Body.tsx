@@ -23,6 +23,7 @@ export const Body: FC<Props> = () => {
 		<TableBody height={RowHeight * (size > Size ? MaxSize : Size) + 'px'}>
 			{isFetching || isLoading ? <BoxFallback /> : null}
 
+			{/* //TODO строка выделяется не полностью */}
 			{data && (
 				<List
 					listRef={listRef}

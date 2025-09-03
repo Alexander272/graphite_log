@@ -52,3 +52,13 @@ export interface ISetPurposeDTO {
 	id: string
 	purpose: string
 }
+
+export interface ISetPlaceDTO {
+	id: string
+	place: string
+}
+
+export interface ISetNotesDTO {
+	id: string
+	notes: string
+}

@@ -1,7 +1,14 @@
 import { toast } from 'react-toastify'
 
 import type { IBaseFetchError } from '@/app/types/error'
-import type { IGetTableItemDTO, ISetPurposeDTO, ITableItem, ITableItemDTO } from './types/item'
+import type {
+	IGetTableItemDTO,
+	ISetNotesDTO,
+	ISetPlaceDTO,
+	ISetPurposeDTO,
+	ITableItem,
+	ITableItemDTO,
+} from './types/item'
 import { API } from '@/app/api'
 import { apiSlice } from '@/app/apiSlice'
 import { buildUrlParams } from './utils/buildUrlParams'
@@ -80,7 +87,7 @@ const tableApiSlice = apiSlice.injectEndpoints({
 				{ type: 'Table', id: 'UNIQUE' },
 			],
 		}),
-		setPlace: builder.mutation<null, ISetPurposeDTO>({
+		setPlace: builder.mutation<null, ISetPlaceDTO>({
 			query: data => ({
 				url: API.table.place(data.id),
 				method: 'PUT',
@@ -91,7 +98,7 @@ const tableApiSlice = apiSlice.injectEndpoints({
 				{ type: 'Table', id: 'UNIQUE' },
 			],
 		}),
-		setNotes: builder.mutation<null, ISetPurposeDTO>({
+		setNotes: builder.mutation<null, ISetNotesDTO>({
 			query: data => ({
 				url: API.table.notes(data.id),
 				method: 'PUT',
