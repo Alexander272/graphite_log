@@ -23,6 +23,7 @@ type Graphite interface {
 	GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error)
 	Create(ctx context.Context, dto *models.GraphiteDTO) error
 	Update(ctx context.Context, dto *models.GraphiteDTO) error
+	SetIssued(ctx context.Context, dto *models.SetGraphiteIssuedDTO) error
 	SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error
 	SetPlace(ctx context.Context, dto *models.SetGraphitePlaceDTO) error
 	SetNotes(ctx context.Context, dto *models.SetGraphiteNotesDTO) error
@@ -65,6 +66,13 @@ func (s *GraphiteService) Create(ctx context.Context, dto *models.GraphiteDTO) e
 func (s *GraphiteService) Update(ctx context.Context, dto *models.GraphiteDTO) error {
 	if err := s.repo.Update(ctx, dto); err != nil {
 		return fmt.Errorf("failed to update graphite. error: %w", err)
+	}
+	return nil
+}
+
+func (s *GraphiteService) SetIssued(ctx context.Context, dto *models.SetGraphiteIssuedDTO) error {
+	if err := s.repo.SetIssued(ctx, dto); err != nil {
+		return fmt.Errorf("failed to set graphite issued. error: %w", err)
 	}
 	return nil
 }

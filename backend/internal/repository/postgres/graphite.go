@@ -28,6 +28,7 @@ type Graphite interface {
 	GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error)
 	Create(ctx context.Context, dto *models.GraphiteDTO) error
 	Update(ctx context.Context, dto *models.GraphiteDTO) error
+	SetIssued(ctx context.Context, dto *models.SetGraphiteIssuedDTO) error
 	SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error
 	SetPlace(ctx context.Context, dto *models.SetGraphitePlaceDTO) error
 	SetNotes(ctx context.Context, dto *models.SetGraphiteNotesDTO) error
@@ -44,7 +45,7 @@ func (r *GraphiteRepo) getColumnName(field string) string {
 		"document":        "document",
 		"supplier":        "supplier",
 		"supplierName":    "supplier_name",
-		"markOnRelease":   "mark_on_release",
+		"issuanceForProd": "issuance",
 		"purpose":         "purpose",
 		"number1c":        "number_1c",
 		"act":             "act",
@@ -87,10 +88,16 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 
 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
 		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes,
+		COALESCE(ext, '') AS extending, COALESCE(issuance, '') AS issuance,
 		COUNT(*) OVER() AS total 
 		FROM %s AS g
+		LEFT JOIN LATERAL (SELECT act AS ext FROM %s WHERE graphite_id=g.id ORDER BY date_of_extending DESC LIMIT 1) AS e ON true
+		LEFT JOIN LATERAL (SELECT string_agg(CONCAT_WS(' ', CASE WHEN amount=0 THEN 'Выдан' ELSE 'Выдано '||amount||' кг' END, 
+			to_char(issuance_date, 'DD.MM.YYYY'), '('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance
+			FROM %s AS i INNER JOIN %s AS u ON user_id::text=u.sso_id
+			WHERE graphite_id=g.id) AS i ON true
 		%s%s%s LIMIT $%d OFFSET $%d`,
-		GraphiteTable,
+		GraphiteTable, ExtendingTable, IssuanceTable, UserTable,
 		filter, search, order, count, count+1,
 	)
 	data := []*models.Graphite{}
@@ -103,7 +110,7 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 
 func (r *GraphiteRepo) GetById(ctx context.Context, req *models.GetGraphiteByIdDTO) (*models.Graphite, error) {
 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, mark_on_release, purpose, number_1c, act, production_date, place, notes 
+		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes 
 		FROM %s WHERE id=$1`,
 		GraphiteTable,
 	)
@@ -124,7 +131,7 @@ func (r *GraphiteRepo) GetUniqueData(ctx context.Context, req *models.GetUniqueD
 	req.Field = strings.ToLower(snake)
 
 	allowedFields := map[string]struct{}{
-		"name": {}, "erp_name": {}, "supplier": {}, "supplier_name": {}, "purpose": {},
+		"name": {}, "erp_name": {}, "supplier": {}, "supplier_name": {}, "purpose": {}, "place": {},
 	}
 
 	if _, exist := allowedFields[req.Field]; !exist {
@@ -166,6 +173,17 @@ func (r *GraphiteRepo) Update(ctx context.Context, dto *models.GraphiteDTO) erro
 	query := fmt.Sprintf(`UPDATE %s SET date_of_receipt=:date_of_receipt, name=:name, erp_name=:erp_name, supplier_batch=:supplier_batch, 
 		big_bag_number=:big_bag_number, registration_number=:registration_number, document=:document, supplier=:supplier, supplier_name=:supplier_name, 
 		number_1c=:number_1c, act=:act, production_date=:production_date, notes=:notes WHERE id=:id`,
+		GraphiteTable,
+	)
+
+	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *GraphiteRepo) SetIssued(ctx context.Context, dto *models.SetGraphiteIssuedDTO) error {
+	query := fmt.Sprintf(`UPDATE %s SET is_all_issued=true, place='' WHERE id=:id`,
 		GraphiteTable,
 	)
 

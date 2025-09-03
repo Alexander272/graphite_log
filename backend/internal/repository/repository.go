@@ -27,6 +27,12 @@ type Realm interface {
 type Graphite interface {
 	postgres.Graphite
 }
+type Extending interface {
+	postgres.Extending
+}
+type IssuanceForProd interface {
+	postgres.IssuanceForProd
+}
 
 type Repository struct {
 	Rule
@@ -37,6 +43,8 @@ type Repository struct {
 	Accesses
 	Realm
 	Graphite
+	Extending
+	IssuanceForProd
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -46,8 +54,10 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Role:     postgres.NewRoleRepo(db),
 		Users:    postgres.NewUserRepo(db),
 
-		Accesses: postgres.NewAccessesRepo(db),
-		Realm:    postgres.NewRealmRepo(db),
-		Graphite: postgres.NewGraphiteRepo(db),
+		Accesses:        postgres.NewAccessesRepo(db),
+		Realm:           postgres.NewRealmRepo(db),
+		Graphite:        postgres.NewGraphiteRepo(db),
+		Extending:       postgres.NewExtendingRepo(db),
+		IssuanceForProd: postgres.NewIssuanceRepo(db),
 	}
 }

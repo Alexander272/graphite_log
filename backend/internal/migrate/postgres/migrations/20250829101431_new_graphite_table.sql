@@ -13,11 +13,7 @@ CREATE TABLE IF NOT EXISTS public.graphite
     document text COLLATE pg_catalog."default" NOT NULL,
     supplier text COLLATE pg_catalog."default" NOT NULL,
     supplier_name text COLLATE pg_catalog."default" NOT NULL,
-    -- TODO в некоторых строках таблицы есть несколько записей
-    mark_on_release boolean DEFAULT false,
-    mark_date timestamp with time zone,
-    responsible text COLLATE pg_catalog."default" DEFAULT ''::text,
-    -- 
+    is_all_issued boolean DEFAULT false,
     purpose text COLLATE pg_catalog."default" DEFAULT ''::text,
     number_1c text COLLATE pg_catalog."default" DEFAULT ''::text,
     act text COLLATE pg_catalog."default" DEFAULT ''::text,

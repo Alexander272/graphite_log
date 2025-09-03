@@ -29,20 +29,29 @@ func NewHandler(service services.Graphite) *Handler {
 func Register(api *gin.RouterGroup, service services.Graphite, middleware *middleware.Middleware) {
 	handler := NewHandler(service)
 
-	graphite := api.Group("/graphite")
+	graphite := api.Group("/graphite", middleware.CheckPermissions(constants.Graphite, constants.Read))
 	{
 		graphite.GET("", handler.get)
 		graphite.GET("/:id", handler.getById)
 		graphite.GET("/unique/:field", handler.getUniqueData)
 
-		// write := graphite.Group("", middleware.CheckPermissions(constants.Graphite, constants.Write))
+		write := graphite.Group("", middleware.CheckPermissions(constants.Graphite, constants.Write))
 		{
-			graphite.POST("", handler.create)
-			graphite.PUT("/:id", handler.update)
-			// TODO надо это как-то разделить тк эти функции для разных пользователей с разными правами
-			graphite.PUT("/:id/purpose", handler.setPurpose)
-			graphite.PUT("/:id/place", handler.setPlace)
-			graphite.PUT("/:id/notes", handler.setNotes)
+			write.POST("", handler.create)
+			write.PUT("/:id", handler.update)
+		}
+
+		purpose := graphite.Group("", middleware.CheckPermissions(constants.GraphitePurpose, constants.Write))
+		{
+			purpose.PUT("/:id/purpose", handler.setPurpose)
+		}
+		place := graphite.Group("", middleware.CheckPermissions(constants.GraphitePlace, constants.Write))
+		{
+			place.PUT("/:id/place", handler.setPlace)
+		}
+		notes := graphite.Group("", middleware.CheckPermissions(constants.GraphiteNotes, constants.Write))
+		{
+			notes.PUT("/:id/notes", handler.setNotes)
 		}
 	}
 }

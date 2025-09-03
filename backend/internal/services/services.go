@@ -17,6 +17,8 @@ type Services struct {
 	Realm
 	Accesses
 	Graphite
+	Extending
+	IssuanceForProd
 }
 
 type Deps struct {
@@ -39,6 +41,8 @@ func NewServices(deps *Deps) *Services {
 	accesses := NewAccessesService(deps.Repo.Accesses)
 
 	graphite := NewGraphiteService(deps.Repo.Graphite)
+	extending := NewExtendingService(deps.Repo.Extending)
+	issuance := NewIssuanceService(deps.Repo.IssuanceForProd, graphite)
 
 	return &Services{
 		RuleItem:   ruleItem,
@@ -48,8 +52,10 @@ func NewServices(deps *Deps) *Services {
 		Permission: permission,
 		Session:    session,
 
-		Realm:    realm,
-		Accesses: accesses,
-		Graphite: graphite,
+		Realm:           realm,
+		Accesses:        accesses,
+		Graphite:        graphite,
+		Extending:       extending,
+		IssuanceForProd: issuance,
 	}
 }

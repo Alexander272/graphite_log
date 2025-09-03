@@ -9,6 +9,8 @@ const (
 	GraphitePurpose = "graphite_purpose"
 	GraphitePlace   = "graphite_place"
 	GraphiteNotes   = "graphite_notes"
+	Extending       = "extending"
+	Issuance        = "Issuance"
 )
 
 const (
