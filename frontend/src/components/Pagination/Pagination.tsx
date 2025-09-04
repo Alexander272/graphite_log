@@ -1,5 +1,5 @@
 import type { FC } from 'react'
-import { Box, Stack, SxProps, Theme, useTheme } from '@mui/material'
+import { Box, Stack, type SxProps, type Theme, useTheme } from '@mui/material'
 
 import { LeftArrowIcon } from '../Icons/LeftArrowIcon'
 import { Button } from './Button'

@@ -1,5 +1,5 @@
 import { SvgIcon } from '@mui/material'
-import { FC } from 'react'
+import type { FC } from 'react'
 
 type Props = {
 	fontSize?: number | string

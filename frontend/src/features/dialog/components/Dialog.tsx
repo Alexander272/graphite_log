@@ -1,6 +1,6 @@
-import { JSX } from 'react'
-import { Stack } from '@mui/material'
+import type { JSX } from 'react'
 import type { DialogProps as MuiDialogProps } from '@mui/material/Dialog'
+import { Stack } from '@mui/material'
 import MuiDialog from '@mui/material/Dialog'
 import MuiDialogActions from '@mui/material/DialogActions'
 import MuiDialogContent from '@mui/material/DialogContent'
