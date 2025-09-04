@@ -53,7 +53,22 @@ export default function ColumnsSetting() {
 				open={open}
 				onClose={closeHandler}
 				anchorEl={anchor.current}
-				paperSx={{ padding: 0, maxWidth: 500 }}
+				paperSx={{
+					padding: 0,
+					maxWidth: 500,
+					'&:before': {
+						content: '""',
+						display: 'block',
+						position: 'absolute',
+						top: 0,
+						right: '36%',
+						width: 10,
+						height: 10,
+						bgcolor: 'background.paper',
+						transform: 'translate(-50%, -50%) rotate(45deg)',
+						zIndex: 0,
+					},
+				}}
 			>
 				<Stack direction={'row'} mx={2} mt={1} mb={2.5} justifyContent={'space-between'} alignItems={'center'}>
 					<Typography fontSize={'1.1rem'}>Настройка колонок</Typography>

@@ -3,13 +3,13 @@ import { FormControl, InputLabel, MenuItem, Select } from '@mui/material'
 import { Controller, useFormContext } from 'react-hook-form'
 
 import type { IFilter } from '../../types/params'
-import { DateField } from '@/components/Form/DateField'
+import { NumberField } from '@/components/Form/NumberField'
 
 type Props = {
 	index: number
 }
 
-export const DateFilter: FC<Props> = ({ index }) => {
+export const NumberFilter: FC<Props> = ({ index }) => {
 	const { control, watch } = useFormContext<{ filters: IFilter[] }>()
 	const type = watch(`filters.${index}.compareType`)
 
@@ -29,25 +29,25 @@ export const DateFilter: FC<Props> = ({ index }) => {
 							labelId={`filters.${index}.compareType`}
 							label='Условие'
 						>
-							<MenuItem key='d_eq' value='eq'>
-								Равна
+							<MenuItem key='n_eq' value='eq'>
+								Равно
 							</MenuItem>
-							<MenuItem key='d_gte' value='gte'>
-								Больше или равна
+							<MenuItem key='n_gte' value='gte'>
+								Больше или равно
 							</MenuItem>
-							<MenuItem key='d_lte' value='lte'>
-								Меньше или равна
+							<MenuItem key='n_lte' value='lte'>
+								Меньше или равно
 							</MenuItem>
-							<MenuItem key='d_empty' value='null'>
-								Не заполнена
+							<MenuItem key='n_empty' value='null'>
+								Не заполнено
 							</MenuItem>
 						</Select>
 					</FormControl>
 				)}
 			/>
 
-			<DateField
-				data={{ name: `filters.${index}.value`, type: 'date', label: 'Значение', isRequired: type != 'null' }}
+			<NumberField
+				data={{ name: `filters.${index}.value`, type: 'number', label: 'Значение', isRequired: type != 'null' }}
 			/>
 		</>
 	)

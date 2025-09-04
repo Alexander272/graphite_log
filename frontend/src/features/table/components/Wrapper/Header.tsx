@@ -8,6 +8,7 @@ import { PlusIcon } from '@/components/Icons/PlusIcon'
 import { CreateDialog } from '../Dialogs/Create'
 import { Search } from '../Search/Search'
 import { Setting } from '../Setting/SettingLazy'
+import { Filters } from '../Filters/Filters'
 
 export const Header = () => {
 	const { palette } = useTheme()
@@ -34,7 +35,7 @@ export const Header = () => {
 
 			<Stack direction={'row'} spacing={2} flexBasis={'20%'} justifyContent={'flex-end'}>
 				<Setting />
-				{/* <Filters /> */}
+				<Filters />
 			</Stack>
 
 			<CreateDialog />

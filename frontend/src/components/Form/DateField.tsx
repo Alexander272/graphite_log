@@ -36,6 +36,7 @@ export const DateField: FC<Props> = ({ data }) => {
 					slotProps={{
 						textField: {
 							error: Boolean(error),
+							fullWidth: true,
 						},
 					}}
 				/>

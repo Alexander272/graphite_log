@@ -1,11 +1,11 @@
-export interface IHeadColumn {
-	key: string
-	label: string
-	width?: number
-	align?: 'center' | 'right' | 'left'
-	allowsSorting?: boolean
-	children?: IHeadColumn[]
-}
+// export interface IHeadColumn {
+// 	key: string
+// 	label: string
+// 	width?: number
+// 	align?: 'center' | 'right' | 'left'
+// 	allowsSorting?: boolean
+// 	children?: IHeadColumn[]
+// }
 
 export type ColumnTypes = 'text' | 'number' | 'date' | 'file' | 'list' | 'autocomplete' | 'parent'
 
@@ -18,17 +18,10 @@ export interface IColumn {
 	width?: number
 	parentId?: string
 	allowSort?: boolean
-	allowFilter?: boolean
+	// allowFilter?: boolean
 	hidden?: boolean
+	filter?: 'date' | 'text' | 'number' | 'list' | 'autocomplete'
 	children?: IColumn[]
-
-	// key: string
-	// label: string
-	// width?: number
-	// align?: 'center' | 'right' | 'left'
-	// isShow?: boolean
-	// allowSearch?: boolean
-	// formatter?: (value: unknown) => string
 }
 
 export interface IContextMenu {

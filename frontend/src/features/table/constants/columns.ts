@@ -8,6 +8,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'date',
 		width: 120,
 		allowSort: true,
+		filter: 'date',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -16,6 +17,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 250,
 		allowSort: true,
+		filter: 'autocomplete',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -24,6 +26,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 180,
 		allowSort: true,
+		filter: 'autocomplete',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -32,6 +35,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -40,6 +44,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -48,6 +53,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -56,6 +62,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 200,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -64,6 +71,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 200,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -72,6 +80,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 200,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -80,6 +89,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 150,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -88,6 +98,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 150,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -96,6 +107,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -104,6 +116,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -112,6 +125,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'date',
 		width: 120,
 		allowSort: true,
+		filter: 'date',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -120,6 +134,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -128,6 +143,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
+		filter: 'text',
 	},
 	{
 		id: crypto.randomUUID(),
@@ -136,5 +152,6 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 200,
 		allowSort: true,
+		filter: 'text',
 	},
 ])
