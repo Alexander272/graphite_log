@@ -72,7 +72,7 @@ func GetFilterParams(c *gin.Context) *models.Params {
 				Value:       value,
 			})
 		}
-		if values[0].Value == "" {
+		if values[0].CompareType == "" {
 			continue
 		}
 

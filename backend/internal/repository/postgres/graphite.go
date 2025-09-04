@@ -10,8 +10,10 @@ import (
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository/postgres/pq_models"
+	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type GraphiteRepo struct {
@@ -69,7 +71,27 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 	order += "g.created_at DESC, g.id"
 
 	filter := "WHERE realm_id=$1"
-	//TODO: add filter
+	if len(req.Filters) > 0 {
+		filter += " AND "
+		filters := []string{}
+
+		for _, ns := range req.Filters {
+			for _, sv := range ns.Values {
+				filters = append(filters, getFilterLine(sv.CompareType, r.getColumnName(ns.Field), count))
+				if sv.CompareType == "in" {
+					params = append(params, pq.Array(strings.Split(sv.Value, "|")))
+					count++
+					// 	sv.Value = strings.ReplaceAll(sv.Value, ",", "|")
+				}
+				if sv.CompareType != "null" && sv.CompareType != "in" {
+					params = append(params, sv.Value)
+					count++
+				}
+			}
+		}
+		filter += strings.Join(filters, " AND ")
+	}
+	logger.Debug("get graphite", logger.StringAttr("filter", filter))
 
 	search := ""
 	if req.Search != nil {
@@ -83,6 +105,8 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 		count++
 		search += strings.Join(list, " OR ") + ")"
 	}
+
+	logger.Debug("get graphite", logger.AnyAttr("params", params))
 
 	params = append(params, req.Page.Limit, req.Page.Offset)
 
