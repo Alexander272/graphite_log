@@ -2,6 +2,7 @@ package services
 
 import (
 	"github.com/Alexander272/graphite_log/backend/internal/repository"
+	"github.com/Alexander272/graphite_log/backend/internal/services/most"
 	"github.com/Alexander272/graphite_log/backend/pkg/auth"
 	"github.com/Alexander272/graphite_log/backend/pkg/mattermost"
 )
@@ -19,6 +20,9 @@ type Services struct {
 	Graphite
 	Extending
 	IssuanceForProd
+
+	Notification
+	Scheduler
 }
 
 type Deps struct {
@@ -41,8 +45,12 @@ func NewServices(deps *Deps) *Services {
 	accesses := NewAccessesService(deps.Repo.Accesses)
 
 	graphite := NewGraphiteService(deps.Repo.Graphite)
-	extending := NewExtendingService(deps.Repo.Extending)
+	extending := NewExtendingService(deps.Repo.Extending, graphite)
 	issuance := NewIssuanceService(deps.Repo.IssuanceForProd, graphite)
+
+	most := most.NewMostService(most.MostDeps{Client: deps.MostClient})
+	notification := NewNotificationService(&NotificationDeps{Repo: deps.Repo.Notification, Most: most, Graphite: graphite})
+	scheduler := NewSchedulerService(&SchedulerDeps{Notification: notification})
 
 	return &Services{
 		RuleItem:   ruleItem,
@@ -57,5 +65,8 @@ func NewServices(deps *Deps) *Services {
 		Graphite:        graphite,
 		Extending:       extending,
 		IssuanceForProd: issuance,
+
+		Notification: notification,
+		Scheduler:    scheduler,
 	}
 }

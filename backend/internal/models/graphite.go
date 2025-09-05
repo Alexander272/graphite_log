@@ -11,8 +11,12 @@ type GetGraphiteByIdDTO struct {
 	Id string `json:"id" db:"id" binding:"required"`
 }
 
+type GetOverdueDTO struct {
+}
+
 type Graphite struct {
 	Id              string    `json:"id" db:"id"`
+	RealmId         string    `json:"realmId" db:"realm_id"`
 	DateOfReceipt   time.Time `json:"dateOfReceipt" db:"date_of_receipt"`
 	Name            string    `json:"name" db:"name"`
 	ErpName         string    `json:"erpName" db:"erp_name"`

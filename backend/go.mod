@@ -6,6 +6,7 @@ require (
 	github.com/Nerzal/gocloak/v13 v13.9.0
 	github.com/casbin/casbin/v2 v2.121.0
 	github.com/gin-gonic/gin v1.10.1
+	github.com/go-co-op/gocron/v2 v2.16.5
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/goccy/go-json v0.10.5
 	github.com/google/uuid v1.6.0
@@ -44,6 +45,7 @@ require (
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/graph-gophers/graphql-go v1.3.0 // indirect
 	github.com/joho/godotenv v1.5.1 // indirect
+	github.com/jonboulle/clockwork v0.5.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
@@ -65,6 +67,7 @@ require (
 	github.com/pelletier/go-toml/v2 v2.2.2 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.4.0 // indirect
 	github.com/segmentio/ksuid v1.0.4 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect

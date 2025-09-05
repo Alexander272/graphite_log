@@ -9,11 +9,15 @@ import (
 )
 
 type ExtendingService struct {
-	repo repository.Extending
+	repo     repository.Extending
+	graphite Graphite
 }
 
-func NewExtendingService(repo repository.Extending) *ExtendingService {
-	return &ExtendingService{repo: repo}
+func NewExtendingService(repo repository.Extending, graphite Graphite) *ExtendingService {
+	return &ExtendingService{
+		repo:     repo,
+		graphite: graphite,
+	}
 }
 
 type Extending interface {
@@ -34,6 +38,10 @@ func (s *ExtendingService) GetByGraphiteId(ctx context.Context, graphiteId strin
 func (s *ExtendingService) Create(ctx context.Context, dto *models.ExtendingDTO) error {
 	if err := s.repo.Create(ctx, dto); err != nil {
 		return fmt.Errorf("failed to create extending. error: %w", err)
+	}
+
+	if err := s.graphite.ClearIsOverdue(ctx, dto.GraphiteId); err != nil {
+		return fmt.Errorf("failed to set is overdue. error: %w", err)
 	}
 
 	return nil

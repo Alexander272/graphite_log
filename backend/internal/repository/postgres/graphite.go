@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository/postgres/pq_models"
@@ -28,12 +29,15 @@ type Graphite interface {
 	Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*models.Graphite, error)
 	GetById(ctx context.Context, req *models.GetGraphiteByIdDTO) (*models.Graphite, error)
 	GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error)
+	GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error)
 	Create(ctx context.Context, dto *models.GraphiteDTO) error
 	Update(ctx context.Context, dto *models.GraphiteDTO) error
 	SetIssued(ctx context.Context, dto *models.SetGraphiteIssuedDTO) error
 	SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error
 	SetPlace(ctx context.Context, dto *models.SetGraphitePlaceDTO) error
 	SetNotes(ctx context.Context, dto *models.SetGraphiteNotesDTO) error
+	SetIsOverdue(ctx context.Context, idList []string) error
+	ClearIsOverdue(ctx context.Context, id string) error
 }
 
 func (r *GraphiteRepo) getColumnName(field string) string {
@@ -178,6 +182,22 @@ func (r *GraphiteRepo) GetUniqueData(ctx context.Context, req *models.GetUniqueD
 	return data, nil
 }
 
+func (r *GraphiteRepo) GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error) {
+	query := fmt.Sprintf(`SELECT id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, document, 
+		supplier, supplier_name, is_all_issued, purpose, number_1c, act, production_date, place, notes
+		FROM %s
+		WHERE production_date + INTERVAL '24 months' - INTERVAL '14 days' <= $1 AND is_all_issued IS FALSE AND is_overdue IS FALSE
+		ORDER BY realm_id`,
+		GraphiteTable,
+	)
+	data := []*models.Graphite{}
+
+	if err := r.db.SelectContext(ctx, &data, query, time.Now()); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil, nil
+}
+
 func (r *GraphiteRepo) Create(ctx context.Context, dto *models.GraphiteDTO) error {
 	query := fmt.Sprintf(`INSERT INTO %s (id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
 		document, supplier, supplier_name, number_1c, act, production_date, notes)
@@ -245,6 +265,23 @@ func (r *GraphiteRepo) SetNotes(ctx context.Context, dto *models.SetGraphiteNote
 	)
 
 	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *GraphiteRepo) SetIsOverdue(ctx context.Context, idList []string) error {
+	query := fmt.Sprintf(`UPDATE %s SET is_overdue=true WHERE id=ANY($1::uuid[])`, GraphiteTable)
+
+	if _, err := r.db.ExecContext(ctx, query, pq.Array(idList)); err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+func (r *GraphiteRepo) ClearIsOverdue(ctx context.Context, id string) error {
+	query := fmt.Sprintf(`UPDATE %s SET is_overdue=false WHERE id=$1`, GraphiteTable)
+
+	if _, err := r.db.ExecContext(ctx, query, id); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return nil

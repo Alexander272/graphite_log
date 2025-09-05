@@ -34,6 +34,10 @@ type IssuanceForProd interface {
 	postgres.IssuanceForProd
 }
 
+type Notification interface {
+	postgres.Notification
+}
+
 type Repository struct {
 	Rule
 	RuleItem
@@ -45,6 +49,8 @@ type Repository struct {
 	Graphite
 	Extending
 	IssuanceForProd
+
+	Notification
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -59,5 +65,7 @@ func NewRepository(db *sqlx.DB) *Repository {
 		Graphite:        postgres.NewGraphiteRepo(db),
 		Extending:       postgres.NewExtendingRepo(db),
 		IssuanceForProd: postgres.NewIssuanceRepo(db),
+
+		Notification: postgres.NewNotificationRepo(db),
 	}
 }

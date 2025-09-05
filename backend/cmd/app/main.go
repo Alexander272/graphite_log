@@ -84,6 +84,10 @@ func main() {
 	handlers := transport.NewHandler(services, keycloak)
 
 	//* HTTP Server
+	if err := services.Scheduler.Start(&conf.Scheduler); err != nil {
+		log.Fatalf("failed to start scheduler. error: %s\n", err.Error())
+	}
+
 	srv := server.NewServer(conf, handlers.Init(conf))
 	go func() {
 		if err := srv.Run(); !errors.Is(err, http.ErrServerClosed) {
@@ -101,6 +105,10 @@ func main() {
 
 	ctx, shutdown := context.WithTimeout(context.Background(), timeout)
 	defer shutdown()
+
+	if err := services.Scheduler.Stop(); err != nil {
+		logger.Error("failed to stop scheduler.", logger.ErrAttr(err))
+	}
 
 	if err := srv.Stop(ctx); err != nil {
 		logger.Error("failed to stop server:", logger.ErrAttr(err))

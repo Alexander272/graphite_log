@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS public.graphite
     production_date timestamp with time zone,
     place text COLLATE pg_catalog."default" DEFAULT ''::text,
     notes text COLLATE pg_catalog."default" DEFAULT ''::text,
+    is_overdue boolean DEFAULT false,
     created_at timestamp with time zone DEFAULT now(),
     updated_at timestamp with time zone DEFAULT now(), 
     CONSTRAINT graphite_pkey PRIMARY KEY (id),
