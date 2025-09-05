@@ -1,11 +1,12 @@
 import type { FC, MouseEvent } from 'react'
 import type { RowComponentProps } from 'react-window'
+import { useTheme } from '@mui/material'
 
 import type { IColumn } from '../../types/table'
 import type { ITableItem } from '../../types/item'
 import { Formatter } from '../../utils/formatter'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
-import { getColumns, setContextMenu, setSelected } from '../../tableSlice'
+import { getColumns, getContextMenu, setContextMenu } from '../../tableSlice'
 import { TableRow } from '@/components/Table/TableRow'
 import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
@@ -18,12 +19,15 @@ import { CellText } from '@/components/CellText/CellText'
 export const Row = ({ index, style, data }: RowComponentProps<{ data: ITableItem[] }>) => {
 	const item = data[index]
 
+	const { palette } = useTheme()
+
 	const columns = useAppSelector(getColumns)
+	const contextMenu = useAppSelector(getContextMenu)
 	const dispatch = useAppDispatch()
 
-	const selectHandler = () => {
-		dispatch(setSelected(item.id))
-	}
+	// const selectHandler = () => {
+	// 	dispatch(setSelected(item.id))
+	// }
 
 	const contextHandler = (event: MouseEvent<HTMLDivElement>) => {
 		event.preventDefault()
@@ -36,10 +40,15 @@ export const Row = ({ index, style, data }: RowComponentProps<{ data: ITableItem
 
 	return (
 		<TableRow
-			onClick={selectHandler}
+			// onClick={selectHandler}
 			onContext={contextHandler}
 			hover
-			sx={{ padding: '0 6px', ...style, width: 'fit-content' }}
+			sx={{
+				padding: '0 6px',
+				...style,
+				width: 'fit-content',
+				backgroundColor: contextMenu?.active == item.id ? palette.rowActive.main : '',
+			}}
 		>
 			{columns.map(c => {
 				if (c?.hidden) return null

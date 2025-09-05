@@ -2,7 +2,7 @@ import type { IColumn } from '../types/table'
 
 export const Columns: readonly IColumn[] = Object.freeze([
 	{
-		id: crypto.randomUUID(),
+		id: '3a15ad17-1903-4ae3-bd50-66487cedef87',
 		field: 'dateOfReceipt',
 		name: 'Дата поступления',
 		type: 'date',
@@ -11,7 +11,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'date',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: 'ce68d33c-24b8-44c2-93af-c1fe90e2ea4d',
 		field: 'name',
 		name: 'Наименование в 1С',
 		type: 'text',
@@ -20,7 +20,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'autocomplete',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '31577c56-2994-4f3e-a5e9-7d00b3a0c549',
 		field: 'erpName',
 		name: 'Наименование в ERP',
 		type: 'text',
@@ -29,7 +29,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'autocomplete',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '97f3d4b5-571d-48d1-a404-74a61e27fccf',
 		field: 'supplierBatch',
 		name: 'Партия поставщика',
 		type: 'text',
@@ -38,7 +38,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: 'ccb3ba45-265d-47df-8b0b-26f02bf1407f',
 		field: 'bigBagNumber',
 		name: '№ б/б поставщика',
 		type: 'text',
@@ -47,7 +47,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '9513d51e-fe8a-40fa-820b-abc6b42cb448',
 		field: 'regNumber',
 		name: 'Регистрационный №',
 		type: 'text',
@@ -56,7 +56,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '7e8011ae-9a64-49a1-baa4-650e17ee11f4',
 		field: 'document',
 		name: 'Документ приобретения',
 		type: 'text',
@@ -65,25 +65,25 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '6beda8fa-2db3-4c9a-b5cf-48fe2e9eb7a7',
 		field: 'supplier',
 		name: 'Поставщик',
 		type: 'text',
 		width: 200,
 		allowSort: true,
-		filter: 'text',
+		filter: 'autocomplete',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '752fff2a-d551-4d5e-9d9a-c5a161f38cc0',
 		field: 'supplierName',
 		name: 'Наименование поставщика',
 		type: 'text',
 		width: 200,
 		allowSort: true,
-		filter: 'text',
+		filter: 'autocomplete',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: 'df2a1678-db59-4d63-9c49-e5950b1b788a',
 		field: 'issuanceForProd',
 		name: 'Отметка о выдаче в производство',
 		type: 'text',
@@ -92,7 +92,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: 'd356d1e2-7cf4-4e68-8201-190fb2fccc7e',
 		field: 'purpose',
 		name: 'Назначение ИГ',
 		type: 'text',
@@ -101,7 +101,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '4f212f94-d276-41c4-843d-43e8d9fe4cfb',
 		field: 'number1c',
 		name: '№ ПО в 1С',
 		type: 'text',
@@ -110,7 +110,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: 'e36be32d-bd1d-4706-bc56-9b2328c133f4',
 		field: 'act',
 		name: '№ Акта',
 		type: 'text',
@@ -119,7 +119,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '48b34447-7a93-4705-b5c0-8a6363c0b515',
 		field: 'productionDate',
 		name: 'Дата производства',
 		type: 'date',
@@ -128,7 +128,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'date',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: '86cbd70e-057f-4c1c-a52d-31985f835d58',
 		field: 'extendingMark',
 		name: 'Отметка о продлении срока годности',
 		type: 'text',
@@ -137,7 +137,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: 'ec4c0601-1afb-4091-bc03-b2f3414de226',
 		field: 'place',
 		name: 'Место хранения',
 		type: 'text',
@@ -146,7 +146,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		filter: 'text',
 	},
 	{
-		id: crypto.randomUUID(),
+		id: 'a8b37277-437c-4471-87b7-282a30de4691',
 		field: 'notes',
 		name: 'Примечание',
 		type: 'text',

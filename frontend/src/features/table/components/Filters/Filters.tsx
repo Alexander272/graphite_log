@@ -123,7 +123,7 @@ export const Filters = () => {
 								display: 'block',
 								position: 'absolute',
 								top: 0,
-								right: '12%',
+								right: '10%',
 								width: 10,
 								height: 10,
 								bgcolor: 'background.paper',
