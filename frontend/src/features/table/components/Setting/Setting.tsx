@@ -61,7 +61,7 @@ export default function ColumnsSetting() {
 						display: 'block',
 						position: 'absolute',
 						top: 0,
-						right: '36%',
+						right: '34%',
 						width: 10,
 						height: 10,
 						bgcolor: 'background.paper',

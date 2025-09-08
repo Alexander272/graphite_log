@@ -21,11 +21,13 @@ export interface ITableItem {
 	supplier: string
 	supplierName: string
 	markOnRelease: string
+	isIssued: boolean
 	purpose: string
 	number1c: string
 	act: string
 	productionDate: string
 	markOfExtending: string
+	isOverdue: boolean
 	place: string
 	notes: string
 }

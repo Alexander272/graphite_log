@@ -1,6 +1,9 @@
 import { ListItemIcon, Menu, MenuItem } from '@mui/material'
 
+import { PermRules } from '@/features/user/constants/permissions'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
+import { useCheckPermission } from '@/features/user/hooks/check'
+import { useGetTableItemByIdQuery } from '../../tableApiSlice'
 import { changeDialogIsOpen, type DialogVariants } from '@/features/dialog/dialogSlice'
 import { getContextMenu, setContextMenu } from '../../tableSlice'
 import { ClockIcon } from '@/components/Icons/ClockIcon'
@@ -19,6 +22,8 @@ export const ContextMenu = () => {
 	const contextMenu = useAppSelector(getContextMenu)
 	const dispatch = useAppDispatch()
 
+	const { data } = useGetTableItemByIdQuery(contextMenu?.active || '', { skip: !contextMenu?.active })
+
 	const closeHandler = () => {
 		dispatch(setContextMenu())
 	}
@@ -27,6 +32,51 @@ export const ContextMenu = () => {
 		dispatch(changeDialogIsOpen({ variant, isOpen: true, context: contextMenu?.active }))
 		closeHandler()
 	}
+
+	const create = [<CreateOnBase />]
+
+	const purpose = [
+		<MenuItem onClick={contextHandler('SetPurpose')}>
+			<ListItemIcon>
+				<OperationIcon fontSize={20} fill={'#363636'} />
+			</ListItemIcon>
+			Задать назначение
+		</MenuItem>,
+	]
+
+	const produce = [
+		<MenuItem onClick={contextHandler('AddIssuance')} disabled={data?.data.isIssued}>
+			<ListItemIcon>
+				<IntegrationIcon fontSize={20} fill={'#363636'} />
+			</ListItemIcon>
+			Выдать в производство
+		</MenuItem>,
+	]
+	const extending = [
+		<MenuItem onClick={contextHandler('AddExtending')}>
+			<ListItemIcon>
+				<ClockIcon fontSize={18} fill={'#363636'} />
+			</ListItemIcon>
+			Продление срока годности
+		</MenuItem>,
+	]
+
+	const place = [
+		<MenuItem onClick={contextHandler('SetPlace')}>
+			<ListItemIcon>
+				<ExchangeIcon fontSize={18} fill={'#363636'} />
+			</ListItemIcon>
+			Задать место хранения
+		</MenuItem>,
+	]
+	const notes = [
+		<MenuItem onClick={contextHandler('SetNotes')}>
+			<ListItemIcon>
+				<EditDocIcon fontSize={18} fill={'#363636'} />
+			</ListItemIcon>
+			Изменить примечание
+		</MenuItem>,
+	]
 
 	return (
 		<>
@@ -38,38 +88,12 @@ export const ContextMenu = () => {
 					contextMenu ? { top: contextMenu.coords.mouseY, left: contextMenu.coords.mouseX } : undefined
 				}
 			>
-				<CreateOnBase />
-
-				<MenuItem onClick={contextHandler('SetPurpose')}>
-					<ListItemIcon>
-						<OperationIcon fontSize={20} fill={'#363636'} />
-					</ListItemIcon>
-					Задать назначение
-				</MenuItem>
-				<MenuItem onClick={contextHandler('AddIssuance')}>
-					<ListItemIcon>
-						<IntegrationIcon fontSize={20} fill={'#363636'} />
-					</ListItemIcon>
-					Выдать в производство
-				</MenuItem>
-				<MenuItem onClick={contextHandler('AddExtending')}>
-					<ListItemIcon>
-						<ClockIcon fontSize={18} fill={'#363636'} />
-					</ListItemIcon>
-					Продление срока годности
-				</MenuItem>
-				<MenuItem onClick={contextHandler('SetPlace')}>
-					<ListItemIcon>
-						<ExchangeIcon fontSize={18} fill={'#363636'} />
-					</ListItemIcon>
-					Задать место хранения
-				</MenuItem>
-				<MenuItem onClick={contextHandler('SetNotes')}>
-					<ListItemIcon>
-						<EditDocIcon fontSize={18} fill={'#363636'} />
-					</ListItemIcon>
-					Изменить примечание
-				</MenuItem>
+				{useCheckPermission(PermRules.Graphite.Write) ? create : null}
+				{useCheckPermission(PermRules.GraphitePurpose.Write) ? purpose : null}
+				{useCheckPermission(PermRules.Issuance.Write) ? produce : null}
+				{useCheckPermission(PermRules.Extending.Write) ? extending : null}
+				{useCheckPermission(PermRules.GraphitePlace.Write) ? place : null}
+				{useCheckPermission(PermRules.GraphiteNotes.Write) ? notes : null}
 			</Menu>
 
 			<SetPurposeDialog />

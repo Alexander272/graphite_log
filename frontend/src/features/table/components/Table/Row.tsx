@@ -1,5 +1,4 @@
-import type { FC, MouseEvent } from 'react'
-import type { RowComponentProps } from 'react-window'
+import type { CSSProperties, FC, MouseEvent } from 'react'
 import { useTheme } from '@mui/material'
 
 import type { IColumn } from '../../types/table'
@@ -11,14 +10,12 @@ import { TableRow } from '@/components/Table/TableRow'
 import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
 
-// type Props = {
-// 	item: ITableItem
-// 	sx?: CSSProperties
-// }
+type Props = {
+	item: ITableItem
+	sx?: CSSProperties
+}
 
-export const Row = ({ index, style, data }: RowComponentProps<{ data: ITableItem[] }>) => {
-	const item = data[index]
-
+export const Row: FC<Props> = ({ item, sx }) => {
 	const { palette } = useTheme()
 
 	const columns = useAppSelector(getColumns)
@@ -38,16 +35,20 @@ export const Row = ({ index, style, data }: RowComponentProps<{ data: ITableItem
 		dispatch(setContextMenu(menu))
 	}
 
+	let background = ''
+	if (item.isOverdue) background = '#ec5959ce'
+	if (contextMenu?.active == item.id) background = palette.rowActive.main
+
 	return (
 		<TableRow
 			// onClick={selectHandler}
 			onContext={contextHandler}
 			hover
 			sx={{
+				...sx,
 				padding: '0 6px',
-				...style,
-				width: 'fit-content',
-				backgroundColor: contextMenu?.active == item.id ? palette.rowActive.main : '',
+				// width: 'fit-content',
+				backgroundColor: background,
 			}}
 		>
 			{columns.map(c => {

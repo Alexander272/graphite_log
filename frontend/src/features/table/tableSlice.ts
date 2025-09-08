@@ -2,10 +2,11 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 import type { RootState } from '@/app/store'
 import type { IFilter, ISearch, ISort } from './types/params'
-import type { IColumn, IContextMenu, ISelect } from './types/table'
+import type { IColumn, IContextMenu } from './types/table'
 import { Size } from './constants/defaultValues'
 import { localKeys } from './constants/storage'
 import { Columns } from './constants/columns'
+import { setRealm } from '../realms/realmSlice'
 
 interface ITableSlice {
 	page: number
@@ -13,7 +14,7 @@ interface ITableSlice {
 	sort: ISort
 	filters: IFilter[]
 	search: ISearch
-	selected: ISelect
+	// selected: ISelect
 	contextMenu?: IContextMenu
 	columns: IColumn[]
 }
@@ -27,7 +28,7 @@ const initialState: ITableSlice = {
 		value: '',
 		fields: ['name', 'erpName', 'supplierBatch', 'bigBagNumber', 'regNumber'],
 	},
-	selected: {},
+	// selected: {},
 	columns: JSON.parse(localStorage.getItem(localKeys.columns) || 'null') || Columns,
 }
 
@@ -61,29 +62,29 @@ const tableSlice = createSlice({
 		setFilters: (state, action: PayloadAction<IFilter[]>) => {
 			state.filters = action.payload
 			state.page = 1
-			state.selected = {}
+			// state.selected = {}
 			localStorage.setItem(localKeys.filter, JSON.stringify(state.filters))
 		},
 
 		setSearch: (state, action: PayloadAction<string>) => {
 			state.search.value = action.payload
 			state.page = 1
-			state.selected = {}
+			// state.selected = {}
 		},
 		setSearchFields: (state, action: PayloadAction<string[]>) => {
 			state.search.fields = action.payload
 		},
 
-		setSelected: (state, action: PayloadAction<string | string[] | undefined>) => {
-			if (action.payload) {
-				if (typeof action.payload == 'string') {
-					if (state.selected[action.payload]) delete state.selected[action.payload]
-					else state.selected[action.payload] = true
-				} else {
-					state.selected = action.payload.reduce((a, v) => ({ ...a, [v]: true }), {})
-				}
-			} else state.selected = {}
-		},
+		// setSelected: (state, action: PayloadAction<string | string[] | undefined>) => {
+		// 	if (action.payload) {
+		// 		if (typeof action.payload == 'string') {
+		// 			if (state.selected[action.payload]) delete state.selected[action.payload]
+		// 			else state.selected[action.payload] = true
+		// 		} else {
+		// 			state.selected = action.payload.reduce((a, v) => ({ ...a, [v]: true }), {})
+		// 		}
+		// 	} else state.selected = {}
+		// },
 
 		setContextMenu: (state, action: PayloadAction<IContextMenu | undefined>) => {
 			state.contextMenu = action.payload
@@ -99,6 +100,12 @@ const tableSlice = createSlice({
 			return initialState
 		},
 	},
+	extraReducers: builder => {
+		builder.addCase(setRealm, state => {
+			state.page = 1
+			// state.selected = {}
+		})
+	},
 })
 
 export const getTablePage = (state: RootState) => state.table.page
@@ -106,7 +113,7 @@ export const getTableSize = (state: RootState) => state.table.size
 export const getSort = (state: RootState) => state.table.sort
 export const getFilters = (state: RootState) => state.table.filters
 export const getSearch = (state: RootState) => state.table.search
-export const getSelected = (state: RootState) => state.table.selected
+// export const getSelected = (state: RootState) => state.table.selected
 export const getContextMenu = (state: RootState) => state.table.contextMenu
 export const getColumns = (state: RootState) => state.table.columns
 
@@ -120,7 +127,7 @@ export const {
 	setFilters,
 	setSearch,
 	setSearchFields,
-	setSelected,
+	// setSelected,
 	setContextMenu,
 	setColumns,
 	resetTable,

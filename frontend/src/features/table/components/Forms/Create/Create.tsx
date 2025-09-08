@@ -72,7 +72,7 @@ export const Create: FC<Props> = ({ reset }) => {
 
 		try {
 			await create(form).unwrap()
-			methods.reset(defaultValues)
+			toast.success('Позиция сохранена')
 		} catch (error) {
 			toast.error((error as IFetchError).data.message, { autoClose: false })
 		}

@@ -1,11 +1,8 @@
 import { type FC, useEffect } from 'react'
 import { MenuItem, Select, type SelectChangeEvent, type SxProps, type Theme, useTheme } from '@mui/material'
-import { toast } from 'react-toastify'
 
-import type { IFetchError } from '@/app/types/error'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
-import { setPermissions, setRole } from '@/features/user/userSlice'
-import { useChooseRealmMutation, useGetRealmsByUserQuery } from '../realmsApiSlice'
+import { useGetRealmsByUserQuery } from '../realmsApiSlice'
 import { getRealm, setRealm } from '../realmSlice'
 
 type Props = {
@@ -19,7 +16,7 @@ export const ActiveRealm: FC<Props> = ({ sx }) => {
 	const dispatch = useAppDispatch()
 
 	const { data, isFetching } = useGetRealmsByUserQuery(null)
-	const [choose] = useChooseRealmMutation()
+	// const [choose] = useChooseRealmMutation()
 
 	useEffect(() => {
 		if (!data) return
@@ -33,14 +30,14 @@ export const ActiveRealm: FC<Props> = ({ sx }) => {
 		if (!value) return
 
 		dispatch(setRealm(value))
-		try {
-			const payload = await choose(value.id).unwrap()
-			dispatch(setRole(payload.data.role))
-			dispatch(setPermissions(payload.data.permissions))
-		} catch (error) {
-			const fetchError = error as IFetchError
-			toast.error(fetchError.data.message, { autoClose: false })
-		}
+		// try {
+		// 	const payload = await choose(value.id).unwrap()
+		// 	dispatch(setRole(payload.data.role))
+		// 	dispatch(setPermissions(payload.data.permissions))
+		// } catch (error) {
+		// 	const fetchError = error as IFetchError
+		// 	toast.error(fetchError.data.message, { autoClose: false })
+		// }
 	}
 
 	if ((data?.data.length || 0) < 2) return null

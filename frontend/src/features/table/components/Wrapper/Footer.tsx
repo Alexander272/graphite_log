@@ -1,8 +1,9 @@
 import { Box, Stack, Typography } from '@mui/material'
 
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
-import { Pagination } from '@/components/Pagination/Pagination'
+import { useGetTableItems } from '../../hooks/getTableItems'
 import { getTablePage, getTableSize, setPage } from '../../tableSlice'
+import { Pagination } from '@/components/Pagination/Pagination'
 import { Size } from './Size'
 
 export const Footer = () => {
@@ -11,11 +12,7 @@ export const Footer = () => {
 
 	const dispatch = useAppDispatch()
 
-	// const { data } = useGetSI()
-	const data = {
-		data: [],
-		total: 0,
-	}
+	const { data } = useGetTableItems()
 
 	const setPageHandler = (page: number) => {
 		dispatch(setPage(page))
@@ -30,7 +27,12 @@ export const Footer = () => {
 			</Typography> */}
 
 			{totalPages > 1 ? (
-				<Pagination page={page} totalPages={totalPages} onClick={setPageHandler} sx={{ margin: 'auto' }} />
+				<Pagination
+					page={page}
+					totalPages={totalPages}
+					onClick={setPageHandler}
+					sx={{ margin: 'auto', gridColumnStart: 2 }}
+				/>
 			) : (
 				<span />
 			)}

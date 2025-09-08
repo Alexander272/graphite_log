@@ -1,4 +1,4 @@
-import { memo, type FC, type JSX } from 'react'
+import { type FC, type JSX } from 'react'
 
 import type { IColumn } from '../../types/table'
 import { ColWidth, RowHeight } from '../../constants/defaultValues'
@@ -23,7 +23,7 @@ export const Head: FC<Props> = () => {
 	)
 }
 
-const Row = memo(() => {
+const Row = () => {
 	const sort = useAppSelector(getSort)
 	const columns = useAppSelector(getColumns)
 	// const hidden = useAppSelector(getHidden)
@@ -104,4 +104,4 @@ const Row = memo(() => {
 			{renderHeader()}
 		</TableRow>
 	)
-})
+}

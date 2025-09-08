@@ -78,24 +78,16 @@ export const TableCellContainer = styled.div<CellProps>`
 	}
 `
 
-export const TableHeadContainer = styled.div<{ scrollLeft?: number }>`
+export const TableHeadContainer = styled.div`
 	background: #f5f5f5;
 	border-radius: 12px;
 	width: fit-content;
-	transform: ${props => props.scrollLeft && `translateX(-${props.scrollLeft}px)`};
 	/* background-color: #f3f4f8;
 	border-radius: 18px;
 	width: fit-content; */
 `
 
-export const TableBodyContainer = styled.div<{ height?: string }>`
-	height: ${props => props.height && props.height};
-	display: flex;
-	flex-direction: column;
-	& > :first-of-type {
-		overflow: inherit !important;
-	}
-`
+export const TableBodyContainer = styled.div``
 
 type TableProps = {
 	columnWidth?: number | number[]
