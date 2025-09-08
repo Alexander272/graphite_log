@@ -8,6 +8,7 @@ import (
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository"
 	"github.com/Alexander272/graphite_log/backend/internal/services/most"
+	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 )
 
 type NotificationService struct {
@@ -35,11 +36,13 @@ type Notification interface {
 }
 
 func (s *NotificationService) SendOverdue() error {
+	logger.Info("SendOverdue was started")
+
 	data, err := s.graphite.GetOverdue(context.Background(), &models.GetOverdueDTO{})
 	if err != nil {
 		return err
 	}
-	users, err := s.repo.GetAll(context.Background())
+	users, err := s.repo.Get(context.Background(), &models.GetNotificationDTO{Type: "overdue"})
 	if err != nil {
 		return err
 	}
@@ -56,8 +59,9 @@ func (s *NotificationService) SendOverdue() error {
 		dataByRealm[g.RealmId] = append(dataByRealm[g.RealmId], g)
 	}
 
-	title := "#### У графита истекает срок годности\n"
-	tableHead := "| Наименование в 1С | Партия поставщика | № б/б поставщика | Регистрационный № | Дата окончания |"
+	title := "У графита истекает срок годности"
+	tableHead := "| Наименование в 1С | Регистрационный № | Дата производства | Дата истечения срока годности |"
+	tableAlign := "|:--|:--|:--|:--|"
 
 	for _, u := range users {
 		dto := &models.CreatePostDTO{
@@ -65,14 +69,13 @@ func (s *NotificationService) SendOverdue() error {
 			ChannelId: u.ChannelId,
 		}
 
-		table := []string{tableHead}
+		table := []string{tableHead, tableAlign}
 
 		for _, g := range dataByRealm[u.RealmId] {
-			table = append(table, fmt.Sprintf("| %s | %s | %s | %s | %s |\n",
+			table = append(table, fmt.Sprintf("| %s | %s | %s | %s |",
 				g.Name,
-				g.SupplierBatch,
-				g.BigBagNumber,
 				g.RegNumber,
+				g.ProductionDate.Format("02.01.2006"),
 				g.ProductionDate.AddDate(2, 0, 0).Format("02.01.2006"),
 			))
 		}

@@ -23,6 +23,7 @@ type Graphite interface {
 	GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error)
 	GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error)
 	Create(ctx context.Context, dto *models.GraphiteDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.GraphiteDTO) error
 	Update(ctx context.Context, dto *models.GraphiteDTO) error
 	SetIssued(ctx context.Context, dto *models.SetGraphiteIssuedDTO) error
 	SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error
@@ -70,6 +71,13 @@ func (s *GraphiteService) GetOverdue(ctx context.Context, req *models.GetOverdue
 func (s *GraphiteService) Create(ctx context.Context, dto *models.GraphiteDTO) error {
 	if err := s.repo.Create(ctx, dto); err != nil {
 		return fmt.Errorf("failed to create graphite. error: %w", err)
+	}
+	return nil
+}
+
+func (s *GraphiteService) CreateSeveral(ctx context.Context, dto []*models.GraphiteDTO) error {
+	if err := s.repo.CreateSeveral(ctx, dto); err != nil {
+		return fmt.Errorf("failed to create several graphites. error: %w", err)
 	}
 	return nil
 }

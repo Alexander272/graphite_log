@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS public.graphite
 (
     id uuid NOT NULL,
     realm_id uuid NOT NULL,
+    row_num integer NOT NULL DEFAULT nextval('graphite_row_seq'::regclass),
     date_of_receipt timestamp with time zone NOT NULL,
     name text COLLATE pg_catalog."default" NOT NULL,
     erp_name text COLLATE pg_catalog."default" NOT NULL,

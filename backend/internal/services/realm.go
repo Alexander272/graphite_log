@@ -55,7 +55,7 @@ func (s *RealmService) GetByUser(ctx context.Context, req *models.GetRealmByUser
 }
 
 func (s *RealmService) Choose(ctx context.Context, dto *models.ChooseRealmDTO) (*models.User, error) {
-	user, err := s.user.GetRoles(ctx, &models.GetUserInfoDTO{UserId: dto.UserId, Realm: dto.RealmId})
+	user, err := s.user.GetInfo(ctx, &models.GetUserInfoDTO{UserId: dto.UserId, Realm: dto.RealmId})
 	if err != nil {
 		return nil, err
 	}

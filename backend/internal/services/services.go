@@ -23,6 +23,7 @@ type Services struct {
 
 	Notification
 	Scheduler
+	Import
 }
 
 type Deps struct {
@@ -51,6 +52,7 @@ func NewServices(deps *Deps) *Services {
 	most := most.NewMostService(most.MostDeps{Client: deps.MostClient})
 	notification := NewNotificationService(&NotificationDeps{Repo: deps.Repo.Notification, Most: most, Graphite: graphite})
 	scheduler := NewSchedulerService(&SchedulerDeps{Notification: notification})
+	importFile := NewImportService(&ImportDeps{Graphite: graphite, Issuance: issuance, Extending: extending, User: user})
 
 	return &Services{
 		RuleItem:   ruleItem,
@@ -68,5 +70,6 @@ func NewServices(deps *Deps) *Services {
 
 		Notification: notification,
 		Scheduler:    scheduler,
+		Import:       importFile,
 	}
 }

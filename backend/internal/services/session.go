@@ -40,7 +40,7 @@ func (s *SessionService) SignIn(ctx context.Context, u *models.SignInDTO) (*mode
 		return nil, err
 	}
 
-	user, err := s.user.GetRoles(ctx, &models.GetUserInfoDTO{UserId: decodedUser.Id, Realm: u.Realm})
+	user, err := s.user.GetInfo(ctx, &models.GetUserInfoDTO{UserId: decodedUser.Id, Role: decodedUser.Role})
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (s *SessionService) Refresh(ctx context.Context, req *models.RefreshDTO) (*
 		return nil, err
 	}
 
-	user, err := s.user.GetRoles(ctx, &models.GetUserInfoDTO{UserId: decodedUser.Id, Realm: req.Realm})
+	user, err := s.user.GetInfo(ctx, &models.GetUserInfoDTO{UserId: decodedUser.Id, Role: decodedUser.Role})
 	if err != nil {
 		return nil, err
 	}

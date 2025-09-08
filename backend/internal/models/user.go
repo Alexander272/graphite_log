@@ -5,9 +5,6 @@ type User struct {
 	Name        string   `json:"name" db:"name"`
 	Role        string   `json:"role"`
 	Permissions []string `json:"permissions"`
-	// Filters []*SIFilter `json:"filters"`
-
-	Roles []*RoleWithRealm `json:"-"`
 
 	AccessToken  string `json:"token"`
 	RefreshToken string `json:"-"`
@@ -24,6 +21,7 @@ type UserData struct {
 
 type GetUserInfoDTO struct {
 	UserId string `json:"userId"`
+	Role   string
 	Realm  string
 }
 

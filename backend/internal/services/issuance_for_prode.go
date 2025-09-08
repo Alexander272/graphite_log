@@ -23,6 +23,7 @@ func NewIssuanceService(repo repository.IssuanceForProd, graphite Graphite) *Iss
 type IssuanceForProd interface {
 	Get(ctx context.Context, req *models.GetIssuanceForProdDTO) ([]*models.IssuanceForProd, error)
 	Create(ctx context.Context, dto *models.IssuanceForProdDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.IssuanceForProdDTO) error
 	Update(ctx context.Context, dto *models.IssuanceForProdDTO) error
 	Delete(ctx context.Context, dto *models.DelIssuanceForProdDTO) error
 }
@@ -44,6 +45,17 @@ func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForPro
 		if err := s.graphite.SetIssued(ctx, &models.SetGraphiteIssuedDTO{Id: dto.GraphiteId}); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+func (s *IssuanceService) CreateSeveral(ctx context.Context, dto []*models.IssuanceForProdDTO) error {
+	if len(dto) == 0 {
+		return nil
+	}
+
+	if err := s.repo.CreateSeveral(ctx, dto); err != nil {
+		return fmt.Errorf("failed to create several issuances. error: %w", err)
 	}
 	return nil
 }

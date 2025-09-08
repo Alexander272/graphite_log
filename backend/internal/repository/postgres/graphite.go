@@ -11,7 +11,6 @@ import (
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository/postgres/pq_models"
-	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
@@ -31,6 +30,7 @@ type Graphite interface {
 	GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error)
 	GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error)
 	Create(ctx context.Context, dto *models.GraphiteDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.GraphiteDTO) error
 	Update(ctx context.Context, dto *models.GraphiteDTO) error
 	SetIssued(ctx context.Context, dto *models.SetGraphiteIssuedDTO) error
 	SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error
@@ -72,7 +72,7 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 	for _, s := range req.Sort {
 		order += fmt.Sprintf("%s %s, ", r.getColumnName(s.Field), s.Type)
 	}
-	order += "g.created_at DESC, g.id"
+	order += "row_num DESC, g.id"
 
 	filter := "WHERE realm_id=$1"
 	if len(req.Filters) > 0 {
@@ -95,7 +95,6 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 		}
 		filter += strings.Join(filters, " AND ")
 	}
-	logger.Debug("get graphite", logger.StringAttr("filter", filter))
 
 	search := ""
 	if req.Search != nil {
@@ -110,18 +109,17 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 		search += strings.Join(list, " OR ") + ")"
 	}
 
-	logger.Debug("get graphite", logger.AnyAttr("params", params))
-
 	params = append(params, req.Page.Limit, req.Page.Offset)
 
 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes,
-		COALESCE(ext, '') AS extending, COALESCE(issuance, '') AS issuance,
+		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued,
+		COALESCE(ext, '') AS extending, COALESCE(issuance, '') AS issuance, 
 		COUNT(*) OVER() AS total 
 		FROM %s AS g
 		LEFT JOIN LATERAL (SELECT act AS ext FROM %s WHERE graphite_id=g.id ORDER BY date_of_extending DESC LIMIT 1) AS e ON true
 		LEFT JOIN LATERAL (SELECT string_agg(CONCAT_WS(' ', CASE WHEN amount=0 THEN 'Выдан' ELSE 'Выдано '||amount||' кг' END, 
-			to_char(issuance_date, 'DD.MM.YYYY'), '('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance
+			CASE WHEN issuance_date>'2000-01-01'::DATE THEN to_char(issuance_date, 'DD.MM.YYYY') ELSE NULL END, 
+			'('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance
 			FROM %s AS i INNER JOIN %s AS u ON user_id::text=u.sso_id
 			WHERE graphite_id=g.id) AS i ON true
 		%s%s%s LIMIT $%d OFFSET $%d`,
@@ -138,7 +136,7 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 
 func (r *GraphiteRepo) GetById(ctx context.Context, req *models.GetGraphiteByIdDTO) (*models.Graphite, error) {
 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes 
+		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued 
 		FROM %s WHERE id=$1`,
 		GraphiteTable,
 	)
@@ -195,17 +193,34 @@ func (r *GraphiteRepo) GetOverdue(ctx context.Context, req *models.GetOverdueDTO
 	if err := r.db.SelectContext(ctx, &data, query, time.Now()); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
-	return nil, nil
+	return data, nil
 }
 
 func (r *GraphiteRepo) Create(ctx context.Context, dto *models.GraphiteDTO) error {
 	query := fmt.Sprintf(`INSERT INTO %s (id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, number_1c, act, production_date, notes)
+		document, supplier, supplier_name, number_1c, act, production_date, place, notes)
 		VALUES (:id, :realm_id, :date_of_receipt, :name, :erp_name, :supplier_batch, :big_bag_number, :registration_number, 
-		:document, :supplier, :supplier_name, :number_1c, :act, :production_date, :notes)`,
+		:document, :supplier, :supplier_name, :number_1c, :act, :production_date, :place, :notes)`,
 		GraphiteTable,
 	)
 	dto.Id = uuid.NewString()
+
+	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *GraphiteRepo) CreateSeveral(ctx context.Context, dto []*models.GraphiteDTO) error {
+	query := fmt.Sprintf(`INSERT INTO %s (id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
+		document, supplier, supplier_name, number_1c, act, production_date, place, notes, is_all_issued)
+		VALUES (:id, :realm_id, :date_of_receipt, :name, :erp_name, :supplier_batch, :big_bag_number, :registration_number, 
+		:document, :supplier, :supplier_name, :number_1c, :act, :production_date, :place, :notes, :is_all_issued)`,
+		GraphiteTable,
+	)
+	for i := range dto {
+		dto[i].Id = uuid.NewString()
+	}
 
 	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

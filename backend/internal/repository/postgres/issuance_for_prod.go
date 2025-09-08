@@ -20,6 +20,7 @@ func NewIssuanceRepo(db *sqlx.DB) *IssuanceRepo {
 type IssuanceForProd interface {
 	Get(ctx context.Context, req *models.GetIssuanceForProdDTO) ([]*models.IssuanceForProd, error)
 	Create(ctx context.Context, dto *models.IssuanceForProdDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.IssuanceForProdDTO) error
 	Update(ctx context.Context, dto *models.IssuanceForProdDTO) error
 	Delete(ctx context.Context, dto *models.DelIssuanceForProdDTO) error
 }
@@ -43,6 +44,21 @@ func (r *IssuanceRepo) Create(ctx context.Context, dto *models.IssuanceForProdDT
 		IssuanceTable,
 	)
 	dto.Id = uuid.NewString()
+
+	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
+		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *IssuanceRepo) CreateSeveral(ctx context.Context, dto []*models.IssuanceForProdDTO) error {
+	query := fmt.Sprintf(`INSERT INTO %s (id, graphite_id, issuance_date, user_id, is_full, amount) VALUES 
+		(:id, :graphite_id, :issuance_date, :user_id, :is_full, :amount)`,
+		IssuanceTable,
+	)
+	for i := range dto {
+		dto[i].Id = uuid.NewString()
+	}
 
 	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

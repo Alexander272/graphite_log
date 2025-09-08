@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Alexander272/graphite_log/backend/internal/config"
+	"github.com/Alexander272/graphite_log/backend/pkg/error_bot"
 	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 	"github.com/go-co-op/gocron/v2"
 )
@@ -77,10 +78,11 @@ func (s *SchedulerService) Stop() error {
 func (s *SchedulerService) job() {
 	logger.Info("job was started")
 
-	// // Отправка списка реактивов у которых заканчивается срок годности
-	// if err := s.reagent.SendOverdue(context.Background()); err != nil {
-	// 	error_bot.Send(nil, err.Error(), nil)
-	// }
+	// Отправка списка графита у которого заканчивается срок годности
+	if err := s.notification.SendOverdue(); err != nil {
+		logger.Error("send overdue error:", logger.ErrAttr(err))
+		error_bot.Send(nil, err.Error(), nil)
+	}
 
 	// // Удаление пустых папок
 	// if err := s.documents.RemoveEmptyFolders(context.Background()); err != nil {

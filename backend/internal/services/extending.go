@@ -23,6 +23,7 @@ func NewExtendingService(repo repository.Extending, graphite Graphite) *Extendin
 type Extending interface {
 	GetByGraphiteId(ctx context.Context, graphiteId string) ([]*models.Extending, error)
 	Create(ctx context.Context, dto *models.ExtendingDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.ExtendingDTO) error
 	Update(ctx context.Context, dto *models.ExtendingDTO) error
 	Delete(ctx context.Context, dto *models.DeleteExtendingDTO) error
 }
@@ -44,6 +45,17 @@ func (s *ExtendingService) Create(ctx context.Context, dto *models.ExtendingDTO)
 		return fmt.Errorf("failed to set is overdue. error: %w", err)
 	}
 
+	return nil
+}
+
+func (s *ExtendingService) CreateSeveral(ctx context.Context, dto []*models.ExtendingDTO) error {
+	if len(dto) == 0 {
+		return nil
+	}
+
+	if err := s.repo.CreateSeveral(ctx, dto); err != nil {
+		return fmt.Errorf("failed to create several extending. error: %w", err)
+	}
 	return nil
 }
 

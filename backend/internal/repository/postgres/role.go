@@ -105,50 +105,45 @@ func (r *RoleRepo) Get(ctx context.Context, roleName string) (*models.Role, erro
 	}
 
 	role := &models.Role{}
-	rules := make(map[string][]string, 0)
-	extends := make(map[string]struct{})
+	menuMap := make(map[string][]string, len(data))
+	extendsSet := make(map[string]struct{}, len(data))
+
+	//TODO можно попробовать переписать через maps
+	// сначала собрать все возможные доступы в map с ключом id роли
+	// потом пройтись по вложенным ролям и собрать все необходимые доступы
 
 	//EDIT Возможно можно это как-то покрасивее написать
 	for _, r := range data {
-		m, exist := rules[r.Id]
-		if !exist {
-			rules[r.Id] = r.Rules
-
-			if r.Name == roleName {
-				role.Id = r.Id
-				role.Name = r.Name
-				extends[r.Id] = struct{}{}
-				for _, v := range r.Extends {
-					extends[v] = struct{}{}
-				}
+		menuMap[r.Id] = append(menuMap[r.Id], r.Rules...)
+		if r.Name == roleName {
+			role.Id = r.Id
+			role.Name = r.Name
+			extendsSet[r.Id] = struct{}{}
+			for _, v := range r.Extends {
+				extendsSet[v] = struct{}{}
 			}
-		} else {
-			m = append(m, r.Rules...)
-			rules[r.Id] = m
 		}
 	}
 
-	for i := 1; i < len(extends); i++ {
+	for i := 0; i < len(extendsSet); i++ {
 		for _, r := range data {
-			if _, exist := extends[r.Id]; exist {
+			if _, exist := extendsSet[r.Id]; exist {
 				for _, v := range r.Extends {
-					extends[v] = struct{}{}
+					extendsSet[v] = struct{}{}
 				}
-				break
 			}
 		}
 	}
 
-	roleMenu := make(map[string]struct{}, 0)
-	for k := range extends {
-		for _, v := range rules[k] {
-			roleMenu[v] = struct{}{}
+	roleMenuSet := make(map[string]struct{}, len(menuMap))
+	for k := range extendsSet {
+		for _, v := range menuMap[k] {
+			roleMenuSet[v] = struct{}{}
 		}
-		// role.Menu = append(role.Menu, menu[k]...)
 	}
 
-	role.Rules = make([]string, 0, len(roleMenu))
-	for k := range roleMenu {
+	role.Rules = make([]string, 0, len(roleMenuSet))
+	for k := range roleMenuSet {
 		role.Rules = append(role.Rules, k)
 	}
 

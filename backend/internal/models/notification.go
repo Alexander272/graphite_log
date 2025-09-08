@@ -10,6 +10,9 @@ type Notification struct {
 }
 
 type GetNotificationDTO struct {
+	Type string `json:"type" db:"notification_type" binding:"required"`
+}
+type GetNotificationByRealmDTO struct {
 	RealmId string `json:"realmId" db:"realm_id" binding:"required"`
 }
 

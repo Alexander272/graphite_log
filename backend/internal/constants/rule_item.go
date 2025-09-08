@@ -10,7 +10,8 @@ const (
 	GraphitePlace   = "graphite_place"
 	GraphiteNotes   = "graphite_notes"
 	Extending       = "extending"
-	Issuance        = "Issuance"
+	Issuance        = "issuance"
+	Import          = "import"
 )
 
 const (

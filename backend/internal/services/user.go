@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"sort"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository"
@@ -37,7 +38,7 @@ type User interface {
 	GetByRealm(ctx context.Context, req *models.GetByRealmDTO) ([]*models.UserData, error)
 	GetById(ctx context.Context, id string) (*models.UserData, error)
 	GetBySSOId(ctx context.Context, id string) (*models.UserData, error)
-	GetRoles(ctx context.Context, req *models.GetUserInfoDTO) (*models.User, error)
+	GetInfo(ctx context.Context, req *models.GetUserInfoDTO) (*models.User, error)
 	Sync(ctx context.Context) error
 	Create(ctx context.Context, dto *models.UserData) error
 	CreateSeveral(ctx context.Context, dto []*models.UserData) error
@@ -87,31 +88,18 @@ func (s *UserService) GetBySSOId(ctx context.Context, id string) (*models.UserDa
 	return data, nil
 }
 
-func (s *UserService) GetRoles(ctx context.Context, req *models.GetUserInfoDTO) (*models.User, error) {
-	roles, err := s.role.GetWithRealm(ctx, &models.GetRoleByRealmDTO{UserId: req.UserId})
-	if err != nil {
-		return nil, err
-	}
-	user := &models.User{Id: req.UserId}
+func (s *UserService) GetInfo(ctx context.Context, req *models.GetUserInfoDTO) (*models.User, error) {
+	user := &models.User{Id: req.UserId, Role: req.Role}
 
-	user.Roles = roles
-	if req.Realm == "" {
-		user.Role = roles[0].Name
-		req.Realm = roles[0].RealmId
-	} else {
-		for _, r := range roles {
-			if r.RealmId == req.Realm {
-				user.Role = r.Name
-				break
-			}
-		}
-	}
-
-	// get menu
+	// get rules
 	rule, err := s.role.Get(ctx, user.Role)
 	if err != nil {
 		return nil, err
 	}
+
+	sort.Slice(rule.Rules, func(i, j int) bool {
+		return rule.Rules[i] < rule.Rules[j]
+	})
 
 	user.Permissions = rule.Rules
 	return user, nil
