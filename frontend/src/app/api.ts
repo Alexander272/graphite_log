@@ -27,4 +27,5 @@ export const API = {
 		realm: '/users/realm' as const,
 	},
 	roles: '/roles' as const,
+	import: '/import' as const,
 }

@@ -33,12 +33,10 @@ export const Footer = () => {
 					onClick={setPageHandler}
 					sx={{ margin: 'auto', gridColumnStart: 2 }}
 				/>
-			) : (
-				<span />
-			)}
+			) : null}
 
 			{data?.data.length ? (
-				<Stack direction={'row'} alignItems={'center'} justifyContent={'flex-end'}>
+				<Stack direction={'row'} alignItems={'center'} justifyContent={'flex-end'} sx={{ gridColumnStart: 3 }}>
 					<Size total={data?.total || 1} />
 					<Typography sx={{ ml: 2 }}>
 						{(page - 1) * size || 1}-{(page - 1) * size + (data?.data.length || 0)} из {data?.total}

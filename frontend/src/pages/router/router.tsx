@@ -5,6 +5,7 @@ import { Layout } from '@/components/Layout/Layout'
 import { NotFound } from '@/pages/notFound/NotFoundLazy'
 import { Auth } from '@/pages/auth/AuthLazy'
 import { Home } from '@/pages/home/HomeLazy'
+import { Import } from '@/pages/import/ImportLazy'
 import PrivateRoute from './PrivateRoute'
 
 const config: RouteObject[] = [
@@ -23,6 +24,10 @@ const config: RouteObject[] = [
 					{
 						index: true,
 						element: <Home />,
+					},
+					{
+						path: AppRoutes.Import,
+						element: <Import />,
 					},
 				],
 			},

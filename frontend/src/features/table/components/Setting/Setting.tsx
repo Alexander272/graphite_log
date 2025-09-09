@@ -45,7 +45,7 @@ export default function ColumnsSetting() {
 
 	return (
 		<>
-			<IconButton ref={anchor} onClick={toggleHandler} sx={{ my: '-3px!important' }}>
+			<IconButton ref={anchor} onClick={toggleHandler} sx={{ my: '-3px!important', width: 42.5 }}>
 				<SettingIcon fontSize={20} />
 			</IconButton>
 
@@ -61,7 +61,7 @@ export default function ColumnsSetting() {
 						display: 'block',
 						position: 'absolute',
 						top: 0,
-						right: '34%',
+						right: '35%',
 						width: 10,
 						height: 10,
 						bgcolor: 'background.paper',

@@ -19,6 +19,8 @@ interface ITableSlice {
 	columns: IColumn[]
 }
 
+const defaultSearchFields = ['name', 'erpName', 'supplierBatch', 'bigBagNumber', 'regNumber']
+
 const initialState: ITableSlice = {
 	page: +(localStorage.getItem(localKeys.page) || 1),
 	size: +(localStorage.getItem(localKeys.size) || Size),
@@ -26,7 +28,7 @@ const initialState: ITableSlice = {
 	filters: JSON.parse(localStorage.getItem(localKeys.filter) || '[]'),
 	search: {
 		value: '',
-		fields: ['name', 'erpName', 'supplierBatch', 'bigBagNumber', 'regNumber'],
+		fields: JSON.parse(localStorage.getItem(localKeys.search) || 'null') || defaultSearchFields,
 	},
 	// selected: {},
 	columns: JSON.parse(localStorage.getItem(localKeys.columns) || 'null') || Columns,
@@ -73,6 +75,7 @@ const tableSlice = createSlice({
 		},
 		setSearchFields: (state, action: PayloadAction<string[]>) => {
 			state.search.fields = action.payload
+			localStorage.setItem(localKeys.search, JSON.stringify(action.payload))
 		},
 
 		// setSelected: (state, action: PayloadAction<string | string[] | undefined>) => {

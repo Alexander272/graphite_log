@@ -18,6 +18,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 250,
 		allowSort: true,
 		filter: 'autocomplete',
+		allowSearch: true,
 	},
 	{
 		id: '31577c56-2994-4f3e-a5e9-7d00b3a0c549',
@@ -27,6 +28,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 180,
 		allowSort: true,
 		filter: 'autocomplete',
+		allowSearch: true,
 	},
 	{
 		id: '97f3d4b5-571d-48d1-a404-74a61e27fccf',
@@ -36,6 +38,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 120,
 		allowSort: true,
 		filter: 'text',
+		allowSearch: true,
 	},
 	{
 		id: 'ccb3ba45-265d-47df-8b0b-26f02bf1407f',
@@ -45,6 +48,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 120,
 		allowSort: true,
 		filter: 'text',
+		allowSearch: true,
 	},
 	{
 		id: '9513d51e-fe8a-40fa-820b-abc6b42cb448',
@@ -54,6 +58,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 120,
 		allowSort: true,
 		filter: 'text',
+		allowSearch: true,
 	},
 	{
 		id: '7e8011ae-9a64-49a1-baa4-650e17ee11f4',
@@ -72,6 +77,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 200,
 		allowSort: true,
 		filter: 'autocomplete',
+		allowSearch: true,
 	},
 	{
 		id: '752fff2a-d551-4d5e-9d9a-c5a161f38cc0',
@@ -81,6 +87,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 200,
 		allowSort: true,
 		filter: 'autocomplete',
+		allowSearch: true,
 	},
 	{
 		id: 'df2a1678-db59-4d63-9c49-e5950b1b788a',
@@ -99,6 +106,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 150,
 		allowSort: true,
 		filter: 'text',
+		allowSearch: true,
 	},
 	{
 		id: '4f212f94-d276-41c4-843d-43e8d9fe4cfb',
@@ -108,6 +116,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 120,
 		allowSort: true,
 		filter: 'text',
+		allowSearch: true,
 	},
 	{
 		id: 'e36be32d-bd1d-4706-bc56-9b2328c133f4',
@@ -144,6 +153,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 120,
 		allowSort: true,
 		filter: 'text',
+		allowSearch: true,
 	},
 	{
 		id: 'a8b37277-437c-4471-87b7-282a30de4691',
@@ -153,5 +163,6 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		width: 200,
 		allowSort: true,
 		filter: 'text',
+		allowSearch: true,
 	},
 ])

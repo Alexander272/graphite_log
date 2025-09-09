@@ -33,10 +33,10 @@ export const ContextMenu = () => {
 		closeHandler()
 	}
 
-	const create = [<CreateOnBase />]
+	const create = [<CreateOnBase key={'CreateOnBase'} />]
 
 	const purpose = [
-		<MenuItem onClick={contextHandler('SetPurpose')}>
+		<MenuItem key={'SetPurpose'} onClick={contextHandler('SetPurpose')} disabled={data?.data.isIssued}>
 			<ListItemIcon>
 				<OperationIcon fontSize={20} fill={'#363636'} />
 			</ListItemIcon>
@@ -45,7 +45,7 @@ export const ContextMenu = () => {
 	]
 
 	const produce = [
-		<MenuItem onClick={contextHandler('AddIssuance')} disabled={data?.data.isIssued}>
+		<MenuItem key={'AddIssuance'} onClick={contextHandler('AddIssuance')} disabled={data?.data.isIssued}>
 			<ListItemIcon>
 				<IntegrationIcon fontSize={20} fill={'#363636'} />
 			</ListItemIcon>
@@ -53,7 +53,7 @@ export const ContextMenu = () => {
 		</MenuItem>,
 	]
 	const extending = [
-		<MenuItem onClick={contextHandler('AddExtending')}>
+		<MenuItem key={'AddExtending'} onClick={contextHandler('AddExtending')} disabled={data?.data.isIssued}>
 			<ListItemIcon>
 				<ClockIcon fontSize={18} fill={'#363636'} />
 			</ListItemIcon>
@@ -62,7 +62,7 @@ export const ContextMenu = () => {
 	]
 
 	const place = [
-		<MenuItem onClick={contextHandler('SetPlace')}>
+		<MenuItem key={'SetPlace'} onClick={contextHandler('SetPlace')} disabled={data?.data.isIssued}>
 			<ListItemIcon>
 				<ExchangeIcon fontSize={18} fill={'#363636'} />
 			</ListItemIcon>
@@ -70,7 +70,7 @@ export const ContextMenu = () => {
 		</MenuItem>,
 	]
 	const notes = [
-		<MenuItem onClick={contextHandler('SetNotes')}>
+		<MenuItem key={'SetNotes'} onClick={contextHandler('SetNotes')}>
 			<ListItemIcon>
 				<EditDocIcon fontSize={18} fill={'#363636'} />
 			</ListItemIcon>

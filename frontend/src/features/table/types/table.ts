@@ -21,6 +21,7 @@ export interface IColumn {
 	// allowFilter?: boolean
 	hidden?: boolean
 	filter?: 'date' | 'text' | 'number' | 'list' | 'autocomplete'
+	allowSearch?: boolean
 	children?: IColumn[]
 }
 

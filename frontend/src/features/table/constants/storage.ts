@@ -3,6 +3,7 @@ export const localKeys = Object.freeze({
 	size: 'graphite_log/size' as const,
 	sort: 'graphite_log/sort' as const,
 	filter: 'graphite_log/filter' as const,
+	search: 'graphite_log/search' as const,
 	hidden: 'graphite_log/hidden' as const,
 	columns: 'graphite_log/columns' as const,
 

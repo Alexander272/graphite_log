@@ -6,15 +6,19 @@ import { useAppSelector } from '@/hooks/redux'
 import { useSignOutMutation } from '@/features/auth/authApiSlice'
 import { getToken } from '@/features/user/userSlice'
 // import { GeometryIcon } from '../Icons/GeometryIcon'
-import { NavButton } from './header.style'
+import { NavButton, NavLink } from './header.style'
 
 import logo from '@/assets/logo.webp'
 import { PenIcon } from '../Icons/PenIcon'
+import { useCheckPermission } from '@/features/user/hooks/check'
+import { PermRules } from '@/features/user/constants/permissions'
 
 export const LayoutHeader = () => {
 	const [signOut] = useSignOutMutation()
 
 	const token = useAppSelector(getToken)
+
+	const canImport = useCheckPermission(PermRules.Import.Write)
 
 	const signOutHandler = () => {
 		void signOut(null)
@@ -31,6 +35,7 @@ export const LayoutHeader = () => {
 
 				{token && (
 					<Stack direction={'row'} spacing={3} minHeight={'100%'}>
+						{canImport && <NavLink to={AppRoutes.Import}>Импорт</NavLink>}
 						<NavButton onClick={signOutHandler}>Выйти</NavButton>
 					</Stack>
 				)}
