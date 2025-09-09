@@ -182,7 +182,8 @@ func (r *GraphiteRepo) GetUniqueData(ctx context.Context, req *models.GetUniqueD
 
 func (r *GraphiteRepo) GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error) {
 	query := fmt.Sprintf(`SELECT id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, document, 
-		supplier, supplier_name, is_all_issued, purpose, number_1c, act, production_date, place, notes
+		supplier, supplier_name, is_all_issued, purpose, number_1c, act, production_date, place, notes, 
+		COALESCE(date_of_extending, '1900-01-01'::DATE) AS date_of_extending, COALESCE(period_of_extending, 0) AS period_of_extending
 		FROM %s AS g
 		LEFT JOIN LATERAL (SELECT date_of_extending, period_of_extending FROM %s WHERE graphite_id=g.id ORDER BY date_of_extending DESC LIMIT 1) AS e ON TRUE 
 		WHERE production_date + INTERVAL '24 months' - INTERVAL '14 days' <= $1

@@ -40,7 +40,6 @@ export const ActiveRealm: FC<Props> = ({ sx }) => {
 		// }
 	}
 
-	if ((data?.data.length || 0) < 2) return null
 	return (
 		<Select
 			value={realm?.id || ''}

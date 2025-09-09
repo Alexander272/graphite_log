@@ -42,12 +42,12 @@ func (s *NotificationService) SendOverdue() error {
 	if err != nil {
 		return err
 	}
-	users, err := s.repo.Get(context.Background(), &models.GetNotificationDTO{Type: "overdue"})
+	nots, err := s.repo.Get(context.Background(), &models.GetNotificationDTO{Type: "overdue"})
 	if err != nil {
 		return err
 	}
 
-	if len(data) == 0 || len(users) == 0 {
+	if len(data) == 0 || len(nots) == 0 {
 		return nil
 	}
 
@@ -63,7 +63,7 @@ func (s *NotificationService) SendOverdue() error {
 	tableHead := "| Наименование в 1С | Регистрационный № | Дата производства | Дата истечения срока годности |"
 	tableAlign := "|:--|:--|:--|:--|"
 
-	for _, u := range users {
+	for _, u := range nots {
 		dto := &models.CreatePostDTO{
 			UserId:    u.MostId,
 			ChannelId: u.ChannelId,
@@ -72,11 +72,16 @@ func (s *NotificationService) SendOverdue() error {
 		table := []string{tableHead, tableAlign}
 
 		for _, g := range dataByRealm[u.RealmId] {
+			expiryDate := g.ProductionDate.AddDate(2, 0, 0)
+			if g.DateOfExtending.Year() > 2000 {
+				expiryDate = g.DateOfExtending.AddDate(0, g.PeriodOfExtending, 0)
+			}
+
 			table = append(table, fmt.Sprintf("| %s | %s | %s | %s |",
 				g.Name,
 				g.RegNumber,
 				g.ProductionDate.Format("02.01.2006"),
-				g.ProductionDate.AddDate(2, 0, 0).Format("02.01.2006"),
+				expiryDate.Format("02.01.2006"),
 			))
 		}
 		dto.Message = fmt.Sprintf("#### %s\n%s", title, strings.Join(table, "\n"))

@@ -8,9 +8,10 @@ import { DateTextField } from '@/components/DatePicker/DatePicker'
 
 type Props = {
 	data: Field
+	disabled?: boolean
 }
 
-export const DateField: FC<Props> = ({ data }) => {
+export const DateField: FC<Props> = ({ data, disabled }) => {
 	const { control } = useFormContext()
 
 	return (
@@ -33,6 +34,7 @@ export const DateField: FC<Props> = ({ data }) => {
 					slots={{
 						textField: DateTextField,
 					}}
+					disabled={disabled}
 					slotProps={{
 						textField: {
 							error: Boolean(error),

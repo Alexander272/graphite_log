@@ -6,9 +6,10 @@ import type { Field } from './type'
 
 type Props = {
 	data: Field
+	disabled?: boolean
 }
 
-export const NumberField: FC<Props> = ({ data }) => {
+export const NumberField: FC<Props> = ({ data, disabled }) => {
 	const { control } = useFormContext()
 
 	return (
@@ -22,6 +23,7 @@ export const NumberField: FC<Props> = ({ data }) => {
 					value={field.value || ''}
 					onChange={e => field.onChange(+(e.target.value || 0))}
 					label={data.label}
+					disabled={disabled}
 					fullWidth
 					error={Boolean(error)}
 					slotProps={{

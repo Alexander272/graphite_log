@@ -105,14 +105,17 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 			continue
 		}
 
-		dateOfReceipt, err := time.Parse("02/01/2006", row[template.DateOfReceipt])
+		date, err := time.Parse("02/01/2006", row[template.DateOfReceipt])
 		if err != nil {
 			return fmt.Errorf("failed to parse date of receipt. error: %w", err)
 		}
-		dateOfProduce, err := time.Parse("02/01/2006", row[template.ProductionDate])
+		dateOfReceipt := time.Date(date.Year(), date.Month(), date.Day(), date.Hour(), 0, 0, 0, time.Now().Location())
+
+		date, err = time.Parse("02/01/2006", row[template.ProductionDate])
 		if err != nil {
 			return fmt.Errorf("failed to parse production date. error: %w", err)
 		}
+		dateOfProduce := time.Date(date.Year(), date.Month(), date.Day(), date.Hour(), 0, 0, 0, time.Now().Location())
 
 		graphite = append(graphite, &models.GraphiteDTO{
 			RealmId:        dto.RealmId,
@@ -153,14 +156,15 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 				issDate := time.Date(1, 1, 1, 1, 0, 0, 0, time.Now().Location())
 				if dateString != "" {
 					if fullDate.MatchString(dateString) {
-						issDate, err = time.Parse("02.01.2006", dateString)
+						date, err = time.Parse("02.01.2006", dateString)
 					} else if shortDate.MatchString(dateString) {
-						issDate, err = time.Parse("02.01.06", dateString)
+						date, err = time.Parse("02.01.06", dateString)
 					}
 
 					if err != nil {
 						return fmt.Errorf("failed to parse issuance date. error: %w", err)
 					}
+					issDate = time.Date(date.Year(), date.Month(), date.Day(), date.Hour(), 0, 0, 0, time.Now().Location())
 				}
 
 				re = regexp.MustCompile(`\d{1,} кг`)
@@ -198,10 +202,11 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 			re := regexp.MustCompile(`\d{2}.\d{2}.\d{4}`)
 			dateString := re.FindString(row[template.MarkOfExtending])
 
-			actDate, err := time.Parse("02.01.2006", dateString)
+			date, err := time.Parse("02.01.2006", dateString)
 			if err != nil {
 				return fmt.Errorf("failed to parse act date. error: %w", err)
 			}
+			actDate := time.Date(date.Year(), date.Month(), date.Day(), date.Hour(), 0, 0, 0, time.Now().Location())
 
 			extending[index] = &models.ExtendingDTO{
 				Act:    row[template.MarkOfExtending],

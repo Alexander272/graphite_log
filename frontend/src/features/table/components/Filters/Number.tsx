@@ -48,6 +48,7 @@ export const NumberFilter: FC<Props> = ({ index }) => {
 
 			<NumberField
 				data={{ name: `filters.${index}.value`, type: 'number', label: 'Значение', isRequired: type != 'null' }}
+				disabled={type == 'null'}
 			/>
 		</>
 	)

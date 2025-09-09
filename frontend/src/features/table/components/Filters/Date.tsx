@@ -48,6 +48,7 @@ export const DateFilter: FC<Props> = ({ index }) => {
 
 			<DateField
 				data={{ name: `filters.${index}.value`, type: 'date', label: 'Значение', isRequired: type != 'null' }}
+				disabled={type == 'null'}
 			/>
 		</>
 	)
