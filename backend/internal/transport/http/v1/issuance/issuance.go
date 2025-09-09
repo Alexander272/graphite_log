@@ -1,6 +1,7 @@
 package issuance
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/Alexander272/graphite_log/backend/internal/constants"
@@ -73,6 +74,11 @@ func (h *Handler) create(c *gin.Context) {
 	dto.UserId = user.Id
 
 	if err := h.service.Create(c, dto); err != nil {
+		if errors.Is(err, models.ErrWasIssued) {
+			response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Весь графит уже выдан в производство")
+			return
+		}
+
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		error_bot.Send(c, err.Error(), dto)
 		return

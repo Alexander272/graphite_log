@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
-	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 	"github.com/xuri/excelize/v2"
 )
 
@@ -72,7 +71,7 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 		return fmt.Errorf("failed to open excel file. error: %w", err)
 	}
 
-	users, err := s.user.GetByRealm(ctx, &models.GetByRealmDTO{RealmId: dto.RealmId})
+	users, err := s.user.GetByRealm(ctx, &models.GetByRealmDTO{RealmId: dto.RealmId, Include: true})
 	if err != nil {
 		return fmt.Errorf("failed to get all users. error: %w", err)
 	}
@@ -115,8 +114,6 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 			return fmt.Errorf("failed to parse production date. error: %w", err)
 		}
 
-		logger.Debug("import", logger.AnyAttr("row", row))
-
 		graphite = append(graphite, &models.GraphiteDTO{
 			RealmId:        dto.RealmId,
 			DateOfReceipt:  dateOfReceipt,
@@ -128,6 +125,7 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 			Document:       row[template.Document],
 			Supplier:       row[template.Supplier],
 			SupplierName:   row[template.SupplierName],
+			Purpose:        row[template.Purpose],
 			Number1c:       row[template.Number1c],
 			Act:            row[template.Act],
 			ProductionDate: dateOfProduce,
@@ -161,7 +159,6 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 					}
 
 					if err != nil {
-						logger.Error("failed to parse date", logger.StringAttr("date", dateString))
 						return fmt.Errorf("failed to parse issuance date. error: %w", err)
 					}
 				}
@@ -172,7 +169,6 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 				if amountString != "" {
 					amount, err = strconv.ParseFloat(strings.TrimSuffix(amountString, " кг"), 64)
 					if err != nil {
-						logger.Error("failed to parse amount", logger.StringAttr("amount", amountString))
 						return fmt.Errorf("failed to parse amount. error: %w", err)
 					}
 				}
@@ -181,7 +177,11 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 				for _, u := range users {
 					if strings.Contains(row[template.IssuanceForProd], u.LastName) {
 						user = u.SsoId
+						break
 					}
+				}
+				if user == "" {
+					return fmt.Errorf("failed to find user")
 				}
 
 				issuance[index] = append(issuance[index], &models.IssuanceForProdDTO{
@@ -200,14 +200,13 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 
 			actDate, err := time.Parse("02.01.2006", dateString)
 			if err != nil {
-				logger.Error("failed to parse date", logger.StringAttr("date", dateString))
 				return fmt.Errorf("failed to parse act date. error: %w", err)
 			}
 
 			extending[index] = &models.ExtendingDTO{
 				Act:    row[template.MarkOfExtending],
 				Date:   actDate,
-				Period: 12,
+				Period: 24,
 			}
 		}
 

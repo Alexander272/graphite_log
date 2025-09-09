@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
@@ -19,6 +21,7 @@ func NewIssuanceRepo(db *sqlx.DB) *IssuanceRepo {
 
 type IssuanceForProd interface {
 	Get(ctx context.Context, req *models.GetIssuanceForProdDTO) ([]*models.IssuanceForProd, error)
+	GetLast(ctx context.Context, req *models.GetIssuanceForProdDTO) (*models.IssuanceForProd, error)
 	Create(ctx context.Context, dto *models.IssuanceForProdDTO) error
 	CreateSeveral(ctx context.Context, dto []*models.IssuanceForProdDTO) error
 	Update(ctx context.Context, dto *models.IssuanceForProdDTO) error
@@ -33,6 +36,22 @@ func (r *IssuanceRepo) Get(ctx context.Context, req *models.GetIssuanceForProdDT
 	data := []*models.IssuanceForProd{}
 
 	if err := r.db.SelectContext(ctx, &data, query, req.GraphiteId); err != nil {
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return data, nil
+}
+
+func (r *IssuanceRepo) GetLast(ctx context.Context, req *models.GetIssuanceForProdDTO) (*models.IssuanceForProd, error) {
+	query := fmt.Sprintf(`SELECT id, graphite_id, issuance_date, user_id, is_full, amount FROM %s 
+		WHERE graphite_id=$1 ORDER BY issuance_date DESC LIMIT 1`,
+		IssuanceTable,
+	)
+	data := &models.IssuanceForProd{}
+
+	if err := r.db.GetContext(ctx, data, query, req.GraphiteId); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRows
+		}
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return data, nil

@@ -56,7 +56,7 @@ func (r *GraphiteRepo) getColumnName(field string) string {
 		"number1c":        "number_1c",
 		"act":             "act",
 		"productionDate":  "production_date",
-		"markOfExtending": "mark_of_extending",
+		"extendingMark":   "extending",
 		"place":           "place",
 		"notes":           "notes",
 	}
@@ -113,10 +113,10 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 
 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
 		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued,
-		COALESCE(ext, '') AS extending, COALESCE(issuance, '') AS issuance, 
+		COALESCE(extending, '') AS extending, COALESCE(issuance, '') AS issuance, 
 		COUNT(*) OVER() AS total 
 		FROM %s AS g
-		LEFT JOIN LATERAL (SELECT act AS ext FROM %s WHERE graphite_id=g.id ORDER BY date_of_extending DESC LIMIT 1) AS e ON true
+		LEFT JOIN LATERAL (SELECT string_agg(act, '; ' ORDER BY date_of_extending DESC) AS extending FROM %s WHERE graphite_id=g.id) AS e ON true
 		LEFT JOIN LATERAL (SELECT string_agg(CONCAT_WS(' ', CASE WHEN amount=0 THEN 'Выдан' ELSE 'Выдано '||amount||' кг' END, 
 			CASE WHEN issuance_date>'2000-01-01'::DATE THEN to_char(issuance_date, 'DD.MM.YYYY') ELSE NULL END, 
 			'('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance
@@ -183,10 +183,13 @@ func (r *GraphiteRepo) GetUniqueData(ctx context.Context, req *models.GetUniqueD
 func (r *GraphiteRepo) GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error) {
 	query := fmt.Sprintf(`SELECT id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, document, 
 		supplier, supplier_name, is_all_issued, purpose, number_1c, act, production_date, place, notes
-		FROM %s
-		WHERE production_date + INTERVAL '24 months' - INTERVAL '14 days' <= $1 AND is_all_issued IS FALSE AND is_overdue IS FALSE
+		FROM %s AS g
+		LEFT JOIN LATERAL (SELECT date_of_extending, period_of_extending FROM %s WHERE graphite_id=g.id ORDER BY date_of_extending DESC LIMIT 1) AS e ON TRUE 
+		WHERE production_date + INTERVAL '24 months' - INTERVAL '14 days' <= $1
+		AND CASE WHEN date_of_extending IS NOT NULL THEN date_of_extending + (period_of_extending * INTERVAL '1 month') - INTERVAL '14 days'<=$1 ELSE TRUE END 
+		AND is_all_issued IS FALSE AND is_overdue IS FALSE
 		ORDER BY realm_id`,
-		GraphiteTable,
+		GraphiteTable, ExtendingTable,
 	)
 	data := []*models.Graphite{}
 
@@ -213,9 +216,9 @@ func (r *GraphiteRepo) Create(ctx context.Context, dto *models.GraphiteDTO) erro
 
 func (r *GraphiteRepo) CreateSeveral(ctx context.Context, dto []*models.GraphiteDTO) error {
 	query := fmt.Sprintf(`INSERT INTO %s (id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, number_1c, act, production_date, place, notes, is_all_issued)
+		document, supplier, supplier_name, number_1c, act, production_date, place, notes, is_all_issued, purpose)
 		VALUES (:id, :realm_id, :date_of_receipt, :name, :erp_name, :supplier_batch, :big_bag_number, :registration_number, 
-		:document, :supplier, :supplier_name, :number_1c, :act, :production_date, :place, :notes, :is_all_issued)`,
+		:document, :supplier, :supplier_name, :number_1c, :act, :production_date, :place, :notes, :is_all_issued, :purpose)`,
 		GraphiteTable,
 	)
 	for i := range dto {

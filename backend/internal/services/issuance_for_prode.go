@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
@@ -36,7 +37,27 @@ func (s *IssuanceService) Get(ctx context.Context, req *models.GetIssuanceForPro
 	return data, nil
 }
 
+func (s *IssuanceService) GetLast(ctx context.Context, req *models.GetIssuanceForProdDTO) (*models.IssuanceForProd, error) {
+	data, err := s.repo.GetLast(ctx, req)
+	if err != nil {
+		if errors.Is(err, models.ErrNoRows) {
+			return nil, err
+		}
+		return nil, fmt.Errorf("failed to get last issuances. error: %w", err)
+	}
+	return data, nil
+}
+
 func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForProdDTO) error {
+	cnd, err := s.GetLast(ctx, &models.GetIssuanceForProdDTO{GraphiteId: dto.GraphiteId})
+	if err != nil && !errors.Is(err, models.ErrNoRows) {
+		return err
+	}
+
+	if cnd != nil && cnd.IsFull {
+		return models.ErrWasIssued
+	}
+
 	if err := s.repo.Create(ctx, dto); err != nil {
 		return fmt.Errorf("failed to create issuances. error: %w", err)
 	}

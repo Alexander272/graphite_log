@@ -53,6 +53,7 @@ type GraphiteDTO struct {
 	Supplier       string    `json:"supplier" db:"supplier" binding:"required"`
 	SupplierName   string    `json:"supplierName" db:"supplier_name"`
 	Number1c       string    `json:"number1c" db:"number_1c"`
+	Purpose        string    `json:"purpose" db:"purpose"`
 	Act            string    `json:"act" db:"act"`
 	ProductionDate time.Time `json:"productionDate" db:"production_date" binding:"required"`
 	Place          string    `json:"place" db:"place"`
