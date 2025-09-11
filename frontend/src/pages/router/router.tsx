@@ -6,6 +6,7 @@ import { NotFound } from '@/pages/notFound/NotFoundLazy'
 import { Auth } from '@/pages/auth/AuthLazy'
 import { Home } from '@/pages/home/HomeLazy'
 import { Import } from '@/pages/import/ImportLazy'
+import { Realms } from '@/pages/realms/RealmsLazy'
 import PrivateRoute from './PrivateRoute'
 
 const config: RouteObject[] = [
@@ -28,6 +29,10 @@ const config: RouteObject[] = [
 					{
 						path: AppRoutes.Import,
 						element: <Import />,
+					},
+					{
+						path: AppRoutes.Realms,
+						element: <Realms />,
 					},
 				],
 			},

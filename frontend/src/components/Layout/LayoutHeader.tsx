@@ -18,7 +18,8 @@ export const LayoutHeader = () => {
 
 	const token = useAppSelector(getToken)
 
-	const canImport = useCheckPermission(PermRules.Import.Write)
+	const showImport = useCheckPermission(PermRules.Import.Write)
+	const showRealmsSetting = useCheckPermission(PermRules.Realms.Write)
 
 	const signOutHandler = () => {
 		void signOut(null)
@@ -35,7 +36,8 @@ export const LayoutHeader = () => {
 
 				{token && (
 					<Stack direction={'row'} spacing={3} minHeight={'100%'}>
-						{canImport && <NavLink to={AppRoutes.Import}>Импорт</NavLink>}
+						{showImport && <NavLink to={AppRoutes.Import}>Импорт</NavLink>}
+						{showRealmsSetting && <NavLink to={AppRoutes.Realms}>Области</NavLink>}
 						<NavButton onClick={signOutHandler}>Выйти</NavButton>
 					</Stack>
 				)}
