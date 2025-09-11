@@ -60,7 +60,7 @@ func (r *RealmRepo) GetByUser(ctx context.Context, req *models.GetRealmByUserDTO
 }
 
 func (r *RealmRepo) GetById(ctx context.Context, req *models.GetRealmByIdDTO) (*models.Realm, error) {
-	query := fmt.Sprintf(`SELECT id, name, realm, is_active created_at FROM %s WHERE id=$1`,
+	query := fmt.Sprintf(`SELECT id, name, realm, is_active, created_at FROM %s WHERE id=$1`,
 		RealmTable,
 	)
 	data := &models.Realm{}

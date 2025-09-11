@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
@@ -114,51 +115,57 @@ func (s *UserService) Sync(ctx context.Context) error {
 	}
 
 	// получение Id группы
-	groupID := ""
+	syncGroups := []string{}
 	groups, err := s.keycloak.Client.GetGroups(ctx, token.AccessToken, s.keycloak.Realm, gocloak.GetGroupsParams{})
 	if err != nil {
 		return fmt.Errorf("failed to get groups. error: %w", err)
 	}
+	groupName := os.Getenv("SERVICE_ID")
 	for _, g := range groups {
-		if g.Name != nil && *g.Name == "graphite_log" {
-			groupID = *g.ID
-			break
+		if g.Name != nil && *g.Name == groupName {
+			syncGroups = append(syncGroups, *g.ID)
+
+			if g.SubGroups != nil {
+				for _, sg := range *g.SubGroups {
+					syncGroups = append(syncGroups, *sg.ID)
+					// logger.Debug("get all groups", logger.StringAttr("group", *sg.Name), logger.StringAttr("id", *sg.ID))
+				}
+			}
 		}
 		// logger.Debug("get all groups", logger.StringAttr("group", *g.Name), logger.StringAttr("id", *g.ID))
-		// if g.SubGroups != nil {
-		// 	for _, sg := range *g.SubGroups {
-		// 		logger.Debug("get all groups", logger.StringAttr("group", *sg.Name), logger.StringAttr("id", *sg.ID))
-		// 	}
-		// }
+
 	}
 
 	data := []*models.UserData{}
-	keycloakUsers, err := s.keycloak.Client.GetGroupMembers(ctx, token.AccessToken, s.keycloak.Realm, groupID, gocloak.GetGroupsParams{})
-	if err != nil {
-		return fmt.Errorf("failed to get group users. error: %w", err)
-	}
-	for _, u := range keycloakUsers {
-		if u.Enabled != nil && !*u.Enabled {
-			continue
-		}
 
-		item := &models.UserData{}
-		if u.ID != nil {
-			item.SsoId = *u.ID
+	for _, g := range syncGroups {
+		keycloakUsers, err := s.keycloak.Client.GetGroupMembers(ctx, token.AccessToken, s.keycloak.Realm, g, gocloak.GetGroupsParams{})
+		if err != nil {
+			return fmt.Errorf("failed to get group users. error: %w", err)
 		}
-		if u.Username != nil {
-			item.Username = *u.Username
+		for _, u := range keycloakUsers {
+			if u.Enabled != nil && !*u.Enabled {
+				continue
+			}
+
+			item := &models.UserData{}
+			if u.ID != nil {
+				item.SsoId = *u.ID
+			}
+			if u.Username != nil {
+				item.Username = *u.Username
+			}
+			if u.Email != nil {
+				item.Email = *u.Email
+			}
+			if u.FirstName != nil {
+				item.FirstName = *u.FirstName
+			}
+			if u.LastName != nil {
+				item.LastName = *u.LastName
+			}
+			data = append(data, item)
 		}
-		if u.Email != nil {
-			item.Email = *u.Email
-		}
-		if u.FirstName != nil {
-			item.FirstName = *u.FirstName
-		}
-		if u.LastName != nil {
-			item.LastName = *u.LastName
-		}
-		data = append(data, item)
 	}
 
 	users, err := s.GetAll(ctx)

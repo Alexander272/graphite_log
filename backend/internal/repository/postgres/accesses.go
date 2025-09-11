@@ -28,12 +28,11 @@ type Accesses interface {
 }
 
 func (r *AccessesRepo) Get(ctx context.Context, req *models.GetAccessesDTO) ([]*models.Accesses, error) {
-	query := fmt.Sprintf(`SELECT a.id, realm_id, user_id, sso_id, username, first_name, last_name, email, role_id, name, a.created_at 
+	query := fmt.Sprintf(`SELECT a.id, realm_id, user_id, sso_id, username, first_name, last_name, email, a.created_at 
 		FROM %s AS a 
 		INNER JOIN %s AS u ON a.user_id=u.id 
-		INNER JOIN %s AS r ON r.id=a.role_id 
-		WHERE realm_id=$1 ORDER BY name, last_name, first_name`,
-		AccessTable, UserTable, RoleTable,
+		WHERE realm_id=$1 ORDER BY last_name, first_name`,
+		AccessTable, UserTable,
 	)
 	tmp := []*pq_models.Accesses{}
 
@@ -55,10 +54,6 @@ func (r *AccessesRepo) Get(ctx context.Context, req *models.GetAccessesDTO) ([]*
 				LastName:  v.LastName,
 				Email:     v.Email,
 			},
-			Role: &models.Role{
-				Id:   v.RoleId,
-				Name: v.RoleName,
-			},
 		})
 	}
 
@@ -66,8 +61,8 @@ func (r *AccessesRepo) Get(ctx context.Context, req *models.GetAccessesDTO) ([]*
 }
 
 func (r *AccessesRepo) Create(ctx context.Context, dto *models.AccessesDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s (id, realm_id, user_id, role_id) 
-		VALUES (:id, :realm_id, :user_id, :role_id)`,
+	query := fmt.Sprintf(`INSERT INTO %s (id, realm_id, user_id) 
+		VALUES (:id, :realm_id, :user_id)`,
 		AccessTable,
 	)
 	dto.Id = uuid.NewString()
@@ -79,7 +74,7 @@ func (r *AccessesRepo) Create(ctx context.Context, dto *models.AccessesDTO) erro
 }
 
 func (r *AccessesRepo) Update(ctx context.Context, dto *models.AccessesDTO) error {
-	query := fmt.Sprintf(`UPDATE %s SET realm_id=:realm_id, user_id=:user_id, role_id=:role_id WHERE id=:id`,
+	query := fmt.Sprintf(`UPDATE %s SET realm_id=:realm_id, user_id=:user_id WHERE id=:id`,
 		AccessTable,
 	)
 
