@@ -51,7 +51,7 @@ func (r *GraphiteRepo) getColumnName(field string) string {
 		"document":        "document",
 		"supplier":        "supplier",
 		"supplierName":    "supplier_name",
-		"issuanceForProd": "issuance",
+		"issuanceForProd": "issuance_dates",
 		"purpose":         "purpose",
 		"number1c":        "number_1c",
 		"act":             "act",
@@ -117,9 +117,11 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 		COUNT(*) OVER() AS total 
 		FROM %s AS g
 		LEFT JOIN LATERAL (SELECT string_agg(act, '; ' ORDER BY date_of_extending DESC) AS extending FROM %s WHERE graphite_id=g.id) AS e ON true
-		LEFT JOIN LATERAL (SELECT string_agg(CONCAT_WS(' ', CASE WHEN amount=0 THEN 'Выдан' ELSE 'Выдано '||amount||' кг' END, 
-			CASE WHEN issuance_date>'2000-01-01'::DATE THEN to_char(issuance_date, 'DD.MM.YYYY') ELSE NULL END, 
-			'('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance
+		LEFT JOIN LATERAL (SELECT string_agg(CONCAT_WS(' ', CASE WHEN type='return' THEN 'Возвращен' ELSE 'Выдан' END ||
+			CASE WHEN amount=0 THEN '' ELSE CONCAT_WS(' ', 'о',amount,'кг') END, 
+			CASE WHEN issuance_date>'2000-01-01'::DATE THEN to_char(issuance_date AT TIME ZONE 'Asia/Yekaterinburg', 'DD.MM.YYYY') ELSE NULL END, 
+			'('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance,
+			array_agg(issuance_date ORDER BY issuance_date DESC) AS issuance_dates
 			FROM %s AS i INNER JOIN %s AS u ON user_id::text=u.sso_id
 			WHERE graphite_id=g.id) AS i ON true
 		%s%s%s LIMIT $%d OFFSET $%d`,
@@ -249,6 +251,11 @@ func (r *GraphiteRepo) SetIssued(ctx context.Context, dto *models.SetGraphiteIss
 	query := fmt.Sprintf(`UPDATE %s SET is_all_issued=true, place='' WHERE id=:id`,
 		GraphiteTable,
 	)
+	if dto.Place != "" {
+		query = fmt.Sprintf(`UPDATE %s SET is_all_issued=false, place=:place WHERE id=:id`,
+			GraphiteTable,
+		)
+	}
 
 	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)

@@ -42,7 +42,7 @@ func (r *IssuanceRepo) Get(ctx context.Context, req *models.GetIssuanceForProdDT
 }
 
 func (r *IssuanceRepo) GetLast(ctx context.Context, req *models.GetIssuanceForProdDTO) (*models.IssuanceForProd, error) {
-	query := fmt.Sprintf(`SELECT id, graphite_id, issuance_date, user_id, is_full, amount FROM %s 
+	query := fmt.Sprintf(`SELECT id, graphite_id, issuance_date, user_id, is_full, amount, type FROM %s 
 		WHERE graphite_id=$1 ORDER BY issuance_date DESC LIMIT 1`,
 		IssuanceTable,
 	)
@@ -58,8 +58,8 @@ func (r *IssuanceRepo) GetLast(ctx context.Context, req *models.GetIssuanceForPr
 }
 
 func (r *IssuanceRepo) Create(ctx context.Context, dto *models.IssuanceForProdDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s (id, graphite_id, issuance_date, user_id, is_full, amount) VALUES 
-		(:id, :graphite_id, :issuance_date, :user_id, :is_full, :amount)`,
+	query := fmt.Sprintf(`INSERT INTO %s (id, graphite_id, issuance_date, user_id, is_full, amount, type) VALUES 
+		(:id, :graphite_id, :issuance_date, :user_id, :is_full, :amount, :type)`,
 		IssuanceTable,
 	)
 	dto.Id = uuid.NewString()
@@ -71,8 +71,8 @@ func (r *IssuanceRepo) Create(ctx context.Context, dto *models.IssuanceForProdDT
 }
 
 func (r *IssuanceRepo) CreateSeveral(ctx context.Context, dto []*models.IssuanceForProdDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s (id, graphite_id, issuance_date, user_id, is_full, amount) VALUES 
-		(:id, :graphite_id, :issuance_date, :user_id, :is_full, :amount)`,
+	query := fmt.Sprintf(`INSERT INTO %s (id, graphite_id, issuance_date, user_id, is_full, amount, type) VALUES 
+		(:id, :graphite_id, :issuance_date, :user_id, :is_full, :amount, :type)`,
 		IssuanceTable,
 	)
 	for i := range dto {
@@ -87,7 +87,7 @@ func (r *IssuanceRepo) CreateSeveral(ctx context.Context, dto []*models.Issuance
 
 func (r *IssuanceRepo) Update(ctx context.Context, dto *models.IssuanceForProdDTO) error {
 	query := fmt.Sprintf(`UPDATE %s SET graphite_id=:graphite_id, issuance_date=:issuance_date, 
-		user_id=:user_id, is_full=:is_full, amount=:amount WHERE id=:id`,
+		user_id=:user_id, is_full=:is_full, amount=:amount, type=:type WHERE id=:id`,
 		IssuanceTable,
 	)
 

@@ -23,6 +23,7 @@ func NewIssuanceService(repo repository.IssuanceForProd, graphite Graphite) *Iss
 
 type IssuanceForProd interface {
 	Get(ctx context.Context, req *models.GetIssuanceForProdDTO) ([]*models.IssuanceForProd, error)
+	GetLast(ctx context.Context, req *models.GetIssuanceForProdDTO) (*models.IssuanceForProd, error)
 	Create(ctx context.Context, dto *models.IssuanceForProdDTO) error
 	CreateSeveral(ctx context.Context, dto []*models.IssuanceForProdDTO) error
 	Update(ctx context.Context, dto *models.IssuanceForProdDTO) error
@@ -54,7 +55,7 @@ func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForPro
 		return err
 	}
 
-	if cnd != nil && cnd.IsFull {
+	if cnd != nil && cnd.IsFull && dto.Type != "return" {
 		return models.ErrWasIssued
 	}
 
@@ -63,7 +64,7 @@ func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForPro
 	}
 
 	if dto.IsFull {
-		if err := s.graphite.SetIssued(ctx, &models.SetGraphiteIssuedDTO{Id: dto.GraphiteId}); err != nil {
+		if err := s.graphite.SetIssued(ctx, &models.SetGraphiteIssuedDTO{Id: dto.GraphiteId, Place: dto.Place}); err != nil {
 			return err
 		}
 	}

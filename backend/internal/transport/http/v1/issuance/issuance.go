@@ -31,6 +31,7 @@ func Register(api *gin.RouterGroup, service services.IssuanceForProd, middleware
 	issuance := api.Group("/issuance", middleware.CheckPermissions(constants.Issuance, constants.Read))
 	{
 		issuance.GET("", handler.get)
+		issuance.GET("/last", handler.getLast)
 
 		write := issuance.Group("", middleware.CheckPermissions(constants.Issuance, constants.Write))
 		{
@@ -56,6 +57,23 @@ func (h *Handler) get(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, response.DataResponse{Data: data, Total: len(data)})
+}
+
+func (h *Handler) getLast(c *gin.Context) {
+	graphite := c.Query("graphite")
+	if err := uuid.Validate(graphite); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Отправлены некорректные данные")
+		return
+	}
+	dto := &models.GetIssuanceForProdDTO{GraphiteId: graphite}
+
+	data, err := h.service.GetLast(c, dto)
+	if err != nil {
+		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		error_bot.Send(c, err.Error(), nil)
+		return
+	}
+	c.JSON(http.StatusOK, response.DataResponse{Data: data})
 }
 
 func (h *Handler) create(c *gin.Context) {

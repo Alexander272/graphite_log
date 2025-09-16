@@ -1,5 +1,12 @@
 -- +goose Up
 -- +goose StatementBegin
+CREATE SEQUENCE IF NOT EXISTS public.graphite_row_seq
+    INCREMENT 1
+    START 1
+    MINVALUE 1
+    MAXVALUE 2147483647
+    CACHE 1;
+    
 CREATE TABLE IF NOT EXISTS public.graphite
 (
     id uuid NOT NULL,
@@ -32,6 +39,12 @@ CREATE TABLE IF NOT EXISTS public.graphite
         NOT VALID
 )
 TABLESPACE pg_default;
+
+ALTER SEQUENCE public.graphite_row_seq
+    OWNED BY public.graphite.row_num;
+
+ALTER SEQUENCE public.graphite_row_seq
+    OWNER TO postgres;
 
 ALTER TABLE IF EXISTS public.graphite
     OWNER to postgres;

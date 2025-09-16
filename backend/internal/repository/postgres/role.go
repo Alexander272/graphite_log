@@ -105,7 +105,7 @@ func (r *RoleRepo) Get(ctx context.Context, roleName string) (*models.Role, erro
 	}
 
 	role := &models.Role{}
-	menuMap := make(map[string][]string, len(data))
+	ruleMap := make(map[string][]string, len(data))
 	extendsSet := make(map[string]struct{}, len(data))
 
 	//TODO можно попробовать переписать через maps
@@ -114,7 +114,7 @@ func (r *RoleRepo) Get(ctx context.Context, roleName string) (*models.Role, erro
 
 	//EDIT Возможно можно это как-то покрасивее написать
 	for _, r := range data {
-		menuMap[r.Id] = append(menuMap[r.Id], r.Rules...)
+		ruleMap[r.Id] = append(ruleMap[r.Id], r.Rules...)
 		if r.Name == roleName {
 			role.Id = r.Id
 			role.Name = r.Name
@@ -135,9 +135,9 @@ func (r *RoleRepo) Get(ctx context.Context, roleName string) (*models.Role, erro
 		}
 	}
 
-	roleMenuSet := make(map[string]struct{}, len(menuMap))
+	roleMenuSet := make(map[string]struct{}, len(ruleMap))
 	for k := range extendsSet {
-		for _, v := range menuMap[k] {
+		for _, v := range ruleMap[k] {
 			roleMenuSet[v] = struct{}{}
 		}
 	}

@@ -9,6 +9,7 @@ type IssuanceForProd struct {
 	UserId       string    `json:"userId" db:"user_id"`
 	IsFull       bool      `json:"isFull" db:"is_full"`
 	Amount       float64   `json:"amount" db:"amount"`
+	Type         string    `json:"type" db:"type"`
 }
 
 type GetIssuanceForProdDTO struct {
@@ -22,6 +23,8 @@ type IssuanceForProdDTO struct {
 	UserId       string    `json:"userId" db:"user_id"`
 	IsFull       bool      `json:"isFull" db:"is_full"`
 	Amount       float64   `json:"amount" db:"amount"`
+	Type         string    `json:"type" db:"type"`
+	Place        string    `json:"place" db:"place"`
 }
 
 type DelIssuanceForProdDTO struct {

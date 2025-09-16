@@ -69,18 +69,19 @@ type GetUniqueDTO struct {
 }
 
 type SetGraphiteIssuedDTO struct {
-	Id string `json:"id" db:"id" binding:"required"`
+	Id    string `json:"id" db:"id" binding:"required"`
+	Place string `json:"place" db:"place"`
 }
 
 type SetGraphitePurposeDTO struct {
 	Id      string `json:"id" db:"id" binding:"required"`
-	Purpose string `json:"purpose" db:"purpose" binding:"required"`
+	Purpose string `json:"purpose" db:"purpose"`
 }
 type SetGraphitePlaceDTO struct {
 	Id    string `json:"id" db:"id" binding:"required"`
-	Place string `json:"place" db:"place" binding:"required"`
+	Place string `json:"place" db:"place"`
 }
 type SetGraphiteNotesDTO struct {
 	Id    string `json:"id" db:"id" binding:"required"`
-	Notes string `json:"notes" db:"notes" binding:"required"`
+	Notes string `json:"notes" db:"notes"`
 }

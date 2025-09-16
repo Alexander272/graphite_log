@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS public.issuance_for_production
     user_id uuid NOT NULL,
     is_full boolean DEFAULT true,
     amount real DEFAULT 0,
+    type text COLLATE pg_catalog."default" DEFAULT 'issuance'::text,
     created_at timestamp with time zone DEFAULT now(),
     CONSTRAINT issuance_for_production_pkey PRIMARY KEY (id),
     CONSTRAINT issuance_for_production_graphite_id_fkey FOREIGN KEY (graphite_id)

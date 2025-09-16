@@ -188,11 +188,17 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 					return fmt.Errorf("failed to find user")
 				}
 
+				typeIss := "issuance"
+				if strings.Contains(strings.ToLower(part), "возвращен") {
+					typeIss = "return"
+				}
+
 				issuance[index] = append(issuance[index], &models.IssuanceForProdDTO{
 					IssuanceDate: issDate,
 					UserId:       user,
 					IsFull:       row[template.Place] == "",
 					Amount:       amount,
+					Type:         typeIss,
 				})
 			}
 		}
