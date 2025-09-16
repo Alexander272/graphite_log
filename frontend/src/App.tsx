@@ -11,6 +11,7 @@ import '@fontsource/roboto/400.css'
 import { store } from '@/app/store'
 import { AppRouter } from '@/pages/router/AppRouter'
 import { theme } from '@/theme/theme'
+import { OnlineStatus } from './features/onlineStatus/OnlineStatus'
 
 dayjs.locale('ru') // глобальная локализация дат
 dayjs.extend(relativeTime)
@@ -19,6 +20,7 @@ function App() {
 	return (
 		<Provider store={store}>
 			<ThemeProvider theme={theme}>
+				<OnlineStatus />
 				<CssBaseline />
 				<LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale='ru'>
 					<AppRouter />
