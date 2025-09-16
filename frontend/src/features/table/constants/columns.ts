@@ -152,7 +152,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 120,
 		allowSort: true,
-		filter: 'text',
+		filter: 'autocomplete',
 		allowSearch: true,
 	},
 	{

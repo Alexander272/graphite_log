@@ -11,12 +11,13 @@ import { EditDocIcon } from '@/components/Icons/EditDoc'
 import { ExchangeIcon } from '@/components/Icons/ExchangeIcon'
 import { OperationIcon } from '@/components/Icons/OperationIcon'
 import { IntegrationIcon } from '@/components/Icons/IntegrationIcon'
+import { ReplyIcon } from '@/components/Icons/ReplyIcon'
 import { ExtendingDialog } from '../../modules/extending/components/Dialog/Extending'
 import { IssuanceDialog } from '../../modules/issuance/components/Dialog/Issuance'
+import { ReturnDialog } from '../../modules/issuance/components/Dialog/Return'
 import { SetPurposeDialog } from '../Dialogs/SetPurpose'
 import { SetPlaceDialog } from '../Dialogs/SetPlace'
 import { SetNotesDialog } from '../Dialogs/SetNotes'
-import { CreateOnBase } from './CreateOnBase'
 
 export const ContextMenu = () => {
 	const contextMenu = useAppSelector(getContextMenu)
@@ -33,7 +34,7 @@ export const ContextMenu = () => {
 		closeHandler()
 	}
 
-	const create = [<CreateOnBase key={'CreateOnBase'} />]
+	// const create = [<CreateOnBase key={'CreateOnBase'} />]
 
 	const purpose = [
 		<MenuItem key={'SetPurpose'} onClick={contextHandler('SetPurpose')} disabled={data?.data.isIssued}>
@@ -50,6 +51,12 @@ export const ContextMenu = () => {
 				<IntegrationIcon fontSize={20} fill={'#363636'} />
 			</ListItemIcon>
 			Выдать в производство
+		</MenuItem>,
+		<MenuItem key={'Return'} onClick={contextHandler('Return')} disabled={data?.data.markOnRelease == ''}>
+			<ListItemIcon>
+				<ReplyIcon fontSize={18} fill={'#363636'} />
+			</ListItemIcon>
+			Добавить возвращение из производства
 		</MenuItem>,
 	]
 	const extending = [
@@ -88,7 +95,7 @@ export const ContextMenu = () => {
 					contextMenu ? { top: contextMenu.coords.mouseY, left: contextMenu.coords.mouseX } : undefined
 				}
 			>
-				{useCheckPermission(PermRules.Graphite.Write) ? create : null}
+				{/* {useCheckPermission(PermRules.Graphite.Write) ? create : null} */}
 				{useCheckPermission(PermRules.GraphitePurpose.Write) ? purpose : null}
 				{useCheckPermission(PermRules.Issuance.Write) ? produce : null}
 				{useCheckPermission(PermRules.Extending.Write) ? extending : null}
@@ -101,6 +108,7 @@ export const ContextMenu = () => {
 			<SetNotesDialog />
 			<ExtendingDialog />
 			<IssuanceDialog />
+			<ReturnDialog />
 		</>
 	)
 }

@@ -54,6 +54,7 @@ export const Fields = Object.freeze<Field<FormFields>[]>([
 		name: 'regNumber',
 		type: 'text',
 		label: 'Регистрационный №',
+		isRequired: true,
 	},
 	{
 		name: 'document',

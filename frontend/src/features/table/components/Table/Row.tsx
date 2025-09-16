@@ -41,7 +41,7 @@ export const Row: FC<Props> = ({ item, sx }) => {
 
 	return (
 		<TableRow
-			// onClick={selectHandler}
+			onClick={contextHandler}
 			onContext={contextHandler}
 			hover
 			sx={{

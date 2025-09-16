@@ -9,6 +9,7 @@ export type DialogVariants =
 	| 'SetPlace'
 	| 'SetNotes'
 	| 'AddIssuance'
+	| 'Return'
 	| 'Access'
 	| 'History'
 

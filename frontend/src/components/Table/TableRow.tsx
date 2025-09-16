@@ -3,7 +3,7 @@ import type { CSSProperties, FC, MouseEvent, PropsWithChildren } from 'react'
 import { TableRowContainer } from './style'
 
 type Props = {
-	onClick?: () => void
+	onClick?: (event: MouseEvent<HTMLDivElement>) => void
 	onContext?: (event: MouseEvent<HTMLDivElement>) => void
 	width?: number
 	height?: number

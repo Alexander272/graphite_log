@@ -5,47 +5,48 @@ import { toast } from 'react-toastify'
 import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
-import type { IIssuanceDTO } from '../../types/issuance'
+import type { IReturnDTO } from '../../types/issuance'
 import { useAppDispatch } from '@/hooks/redux'
 import { useGetTableItemByIdQuery } from '@/features/table/tableApiSlice'
-import { useCreateIssuanceMutation } from '../../issuanceApiSlice'
+import { useCreateIssuanceMutation, useGetLastIssuanceQuery } from '../../issuanceApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
-import { Inputs } from './IssuanceInputs'
+import { Inputs } from './ReturnInputs'
 
 type Props = {
 	id: string
 }
 
-const defaultValues: IIssuanceDTO = {
+const defaultValues: IReturnDTO = {
 	id: '',
 	graphiteId: '',
 	issuanceDate: dayjs().toISOString(),
 	isFull: true,
-	isNotFull: false,
-	type: 'issuance',
 	amount: 0,
+	type: 'return',
+	place: '',
 }
 
-export const Issuance: FC<Props> = ({ id }) => {
+export const Return: FC<Props> = ({ id }) => {
 	const dispatch = useAppDispatch()
-
-	const methods = useForm<IIssuanceDTO>({
-		values: defaultValues,
-	})
 
 	const [create, { isLoading }] = useCreateIssuanceMutation()
 	const { data, isFetching } = useGetTableItemByIdQuery(id, { skip: !id })
+	const { data: last, isFetching: isFetchingLast } = useGetLastIssuanceQuery(id, { skip: !id })
+
+	const methods = useForm<IReturnDTO>({
+		values: { ...defaultValues, amount: last?.data.amount || 0 },
+	})
 
 	const closeHandler = () => {
-		dispatch(changeDialogIsOpen({ variant: 'AddIssuance', isOpen: false }))
+		dispatch(changeDialogIsOpen({ variant: 'Return', isOpen: false }))
 	}
 
 	const submitHandler = methods.handleSubmit(async form => {
 		console.log('save', form, methods.formState.dirtyFields)
 
 		form.graphiteId = id
-		form.isFull = !form.isNotFull
+		form.place = form.place.trim()
 
 		try {
 			await create(form).unwrap()
@@ -55,9 +56,16 @@ export const Issuance: FC<Props> = ({ id }) => {
 		}
 	})
 
+	if (last?.data.type == 'return')
+		return (
+			<Typography textAlign={'center'}>
+				Возврат уже был сделан в {dayjs(last.data.issuanceDate).format('DD.MM.YYYY')}
+			</Typography>
+		)
+
 	return (
 		<Stack mt={-2.5} position={'relative'}>
-			{isLoading || isFetching ? <BoxFallback /> : null}
+			{isLoading || isFetching || isFetchingLast ? <BoxFallback /> : null}
 
 			<Stack mb={3}>
 				<Typography fontSize={'1.4rem'} textAlign={'center'}>

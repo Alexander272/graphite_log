@@ -68,7 +68,6 @@ export const SetNotes: FC<Props> = ({ id }) => {
 				<Controller
 					control={control}
 					name={'notes'}
-					rules={{ required: true }}
 					render={({ field, fieldState: { error } }) => (
 						<TextField
 							{...field}

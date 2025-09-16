@@ -1,11 +1,33 @@
-import type { IIssuanceDTO } from './types/issuance'
+import { toast } from 'react-toastify'
+
+import type { IIssuance, IIssuanceDTO, IReturnDTO } from './types/issuance'
+import type { IBaseFetchError } from '@/app/types/error'
 import { API } from '@/app/api'
+import { HttpCodes } from '@/constants/httpCodes'
 import { apiSlice } from '@/app/apiSlice'
 
 const issuanceApiSlice = apiSlice.injectEndpoints({
 	overrideExisting: false,
 	endpoints: builder => ({
-		createIssuance: builder.mutation<null, IIssuanceDTO>({
+		getLastIssuance: builder.query<{ data: IIssuance }, string>({
+			query: req => ({
+				url: `${API.issuance}/last`,
+				method: 'GET',
+				params: new URLSearchParams({ graphite: req }),
+			}),
+			providesTags: [{ type: 'Table', id: 'ALL' }],
+			onQueryStarted: async (_arg, api) => {
+				try {
+					await api.queryFulfilled
+				} catch (error) {
+					const fetchError = (error as IBaseFetchError).error
+					if (fetchError.status == HttpCodes.NOT_FOUND) return
+					toast.error(fetchError.data.message, { autoClose: false })
+				}
+			},
+		}),
+
+		createIssuance: builder.mutation<null, IIssuanceDTO | IReturnDTO>({
 			query: data => ({
 				url: API.issuance,
 				method: 'POST',
@@ -33,4 +55,9 @@ const issuanceApiSlice = apiSlice.injectEndpoints({
 	}),
 })
 
-export const { useCreateIssuanceMutation, useUpdateIssuanceMutation, useDeleteIssuanceMutation } = issuanceApiSlice
+export const {
+	useGetLastIssuanceQuery,
+	useCreateIssuanceMutation,
+	useUpdateIssuanceMutation,
+	useDeleteIssuanceMutation,
+} = issuanceApiSlice
