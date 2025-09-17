@@ -45,11 +45,11 @@ const extendingApiSlice = apiSlice.injectEndpoints({
 			invalidatesTags: [{ type: 'Table', id: 'ALL' }],
 		}),
 
-		deleteExtending: builder.mutation<null, { id: string; realm: string }>({
+		deleteExtending: builder.mutation<null, { id: string; realm: string; graphite: string }>({
 			query: data => ({
 				url: `${API.extending}/${data.id}`,
 				method: 'DELETE',
-				params: new URLSearchParams({ realm: data.realm }),
+				params: new URLSearchParams({ realm: data.realm, graphite: data.graphite }),
 			}),
 			invalidatesTags: [{ type: 'Table', id: 'ALL' }],
 		}),

@@ -106,7 +106,7 @@ func (s *IssuanceService) Update(ctx context.Context, dto *models.IssuanceForPro
 		UserId:   dto.UserId,
 		UserName: dto.UserName,
 		Section:  "issuance",
-		ValueId:  dto.Id,
+		ValueId:  dto.GraphiteId,
 		Original: cnd,
 		Changed:  dto,
 	}
@@ -131,7 +131,7 @@ func (s *IssuanceService) Delete(ctx context.Context, dto *models.DelIssuanceFor
 		UserId:   dto.UserId,
 		UserName: dto.UserName,
 		Section:  "issuance",
-		ValueId:  dto.Id,
+		ValueId:  dto.GraphiteId,
 		Original: cnd,
 		Changed:  "",
 	}

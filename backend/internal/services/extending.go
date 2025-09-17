@@ -81,7 +81,7 @@ func (s *ExtendingService) Update(ctx context.Context, dto *models.ExtendingDTO)
 		UserId:   dto.UserId,
 		UserName: dto.UserName,
 		Section:  "extending",
-		ValueId:  dto.Id,
+		ValueId:  dto.GraphiteId,
 		Original: cnd,
 		Changed:  dto,
 	}
@@ -106,7 +106,7 @@ func (s *ExtendingService) Delete(ctx context.Context, dto *models.DeleteExtendi
 		UserId:   dto.UserId,
 		UserName: dto.UserName,
 		Section:  "extending",
-		ValueId:  dto.Id,
+		ValueId:  dto.GraphiteId,
 		Original: cnd,
 		Changed:  "",
 	}

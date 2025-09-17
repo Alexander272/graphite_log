@@ -62,7 +62,7 @@ export const EditExtending: FC<Props> = ({ data }) => {
 	const deleteHandler = async () => {
 		console.log('delete', data)
 		try {
-			await remove({ id: data.id, realm: realm?.id || '' }).unwrap()
+			await remove({ id: data.id, realm: realm?.id || '', graphite: data.graphiteId }).unwrap()
 			closeHandler()
 		} catch (error) {
 			toast.error((error as IFetchError).data.message, { autoClose: false })

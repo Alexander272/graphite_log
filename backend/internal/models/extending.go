@@ -26,8 +26,9 @@ type ExtendingDTO struct {
 }
 
 type DeleteExtendingDTO struct {
-	Id       string `json:"id" db:"id"`
-	RealmId  string `json:"realmId" db:"realm_id"`
-	UserId   string `json:"userId" db:"user_id"`
-	UserName string `json:"userName" db:"user_name"`
+	Id         string `json:"id" db:"id"`
+	RealmId    string `json:"realmId" db:"realm_id"`
+	GraphiteId string `json:"graphiteId" db:"graphite_id"`
+	UserId     string `json:"userId" db:"user_id"`
+	UserName   string `json:"userName" db:"user_name"`
 }

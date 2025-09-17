@@ -1,5 +1,6 @@
 export interface IIssuance {
 	id: string
+	graphiteId: string
 	issuanceDate: string
 	isFull: boolean
 	amount: number

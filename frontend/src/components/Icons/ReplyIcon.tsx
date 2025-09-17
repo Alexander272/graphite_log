@@ -4,13 +4,7 @@ import { SvgIcon, type SxProps, type Theme } from '@mui/material'
 export const ReplyIcon: FC<SxProps<Theme>> = style => {
 	return (
 		<SvgIcon sx={style}>
-			<svg
-				x='0px'
-				y='0px'
-				viewBox='0 0 122.88 98.86'
-				enable-background='new 0 0 122.88 98.86'
-				xmlSpace='preserve'
-			>
+			<svg x='0px' y='0px' viewBox='0 0 122.88 98.86' enableBackground='new 0 0 122.88 98.86' xmlSpace='preserve'>
 				<path
 					fillRule='evenodd'
 					clipRule='evenodd'
