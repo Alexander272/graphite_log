@@ -43,7 +43,9 @@ type Graphite struct {
 }
 
 type GraphiteDTO struct {
-	Id             string    `json:"id" db:"id"`
+	Id             string `json:"id" db:"id"`
+	UserId         string
+	UserName       string
 	RealmId        string    `json:"realmId" db:"realm_id" binding:"required"`
 	DateOfReceipt  time.Time `json:"dateOfReceipt" db:"date_of_receipt" binding:"required"`
 	Name           string    `json:"name" db:"name" binding:"required"`

@@ -153,7 +153,7 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 				re := regexp.MustCompile(`\d{1,2}.\d{1,2}.\d{2,4}`)
 				dateString := re.FindString(part)
 
-				issDate := time.Date(1, 1, 1, 1, 0, 0, 0, time.Now().Location())
+				issDate := time.Time{}
 				if dateString != "" {
 					if fullDate.MatchString(dateString) {
 						date, err = time.Parse("02.01.2006", dateString)

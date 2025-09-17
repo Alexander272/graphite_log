@@ -24,6 +24,7 @@ type Services struct {
 	Notification
 	Scheduler
 	Import
+	Changed
 }
 
 type Deps struct {
@@ -42,12 +43,14 @@ func NewServices(deps *Deps) *Services {
 	user := NewUserService(&UsersDeps{Repo: deps.Repo.Users, Keycloak: deps.Keycloak, Role: role})
 	session := NewSessionService(deps.Keycloak, user)
 
+	changed := NewChangedService(deps.Repo.Changed)
+
 	realm := NewRealmService(deps.Repo.Realm, user)
 	accesses := NewAccessesService(deps.Repo.Accesses)
 
-	graphite := NewGraphiteService(deps.Repo.Graphite)
-	extending := NewExtendingService(deps.Repo.Extending, graphite)
-	issuance := NewIssuanceService(deps.Repo.IssuanceForProd, graphite)
+	graphite := NewGraphiteService(deps.Repo.Graphite, changed)
+	extending := NewExtendingService(deps.Repo.Extending, graphite, changed)
+	issuance := NewIssuanceService(deps.Repo.IssuanceForProd, graphite, changed)
 
 	most := most.NewMostService(most.MostDeps{Client: deps.MostClient})
 	notification := NewNotificationService(&NotificationDeps{Repo: deps.Repo.Notification, Most: most, Graphite: graphite})
@@ -62,6 +65,7 @@ func NewServices(deps *Deps) *Services {
 		Permission: permission,
 		Session:    session,
 
+		Changed:         changed,
 		Realm:           realm,
 		Accesses:        accesses,
 		Graphite:        graphite,

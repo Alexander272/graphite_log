@@ -11,4 +11,5 @@ const (
 	ExtendingTable    = "public.extending"
 	IssuanceTable     = "public.issuance_for_production"
 	NotificationTable = "public.notification"
+	ChangedTable      = "public.changed"
 )

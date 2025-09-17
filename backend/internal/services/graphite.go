@@ -10,11 +10,12 @@ import (
 )
 
 type GraphiteService struct {
-	repo repository.Graphite
+	repo    repository.Graphite
+	changed Changed
 }
 
-func NewGraphiteService(repo repository.Graphite) *GraphiteService {
-	return &GraphiteService{repo: repo}
+func NewGraphiteService(repo repository.Graphite, changed Changed) *GraphiteService {
+	return &GraphiteService{repo: repo, changed: changed}
 }
 
 type Graphite interface {
@@ -83,6 +84,24 @@ func (s *GraphiteService) CreateSeveral(ctx context.Context, dto []*models.Graph
 }
 
 func (s *GraphiteService) Update(ctx context.Context, dto *models.GraphiteDTO) error {
+	cnd, err := s.GetById(ctx, &models.GetGraphiteByIdDTO{Id: dto.Id})
+	if err != nil {
+		return err
+	}
+
+	changedDto := &models.NewChangeDTO{
+		RealmId:  dto.RealmId,
+		UserId:   dto.UserId,
+		UserName: dto.UserName,
+		Section:  "graphite",
+		ValueId:  dto.Id,
+		Original: cnd,
+		Changed:  dto,
+	}
+	if err := s.changed.AddChange(ctx, changedDto); err != nil {
+		return err
+	}
+
 	if err := s.repo.Update(ctx, dto); err != nil {
 		return fmt.Errorf("failed to update graphite. error: %w", err)
 	}
