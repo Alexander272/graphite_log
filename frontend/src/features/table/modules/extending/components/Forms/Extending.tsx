@@ -19,6 +19,7 @@ type Props = {
 
 const defaultValues: IExtendingDTO = {
 	id: '',
+	realmId: '',
 	graphiteId: '',
 	act: '',
 	date: dayjs().toISOString(),
@@ -43,7 +44,7 @@ export const Extending: FC<Props> = ({ id }) => {
 		console.log('save', form, methods.formState.dirtyFields)
 
 		form.graphiteId = id
-		form.act = form.act.trim()
+		form.act = form.act.trim() ? `${form.act.trim()} от ${dayjs(form.date).format('DD.MM.YYYY')}` : ''
 
 		try {
 			await create(form).unwrap()

@@ -3,6 +3,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export type DialogVariants =
 	| 'CreateTableItem'
+	| 'UpdateTableItem'
 	| 'EditTableItem'
 	| 'SetPurpose'
 	| 'AddExtending'

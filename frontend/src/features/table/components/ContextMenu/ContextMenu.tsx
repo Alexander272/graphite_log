@@ -18,6 +18,7 @@ import { ReturnDialog } from '../../modules/issuance/components/Dialog/Return'
 import { SetPurposeDialog } from '../Dialogs/SetPurpose'
 import { SetPlaceDialog } from '../Dialogs/SetPlace'
 import { SetNotesDialog } from '../Dialogs/SetNotes'
+import { UpdateDialog } from '../Dialogs/Update'
 
 export const ContextMenu = () => {
 	const contextMenu = useAppSelector(getContextMenu)
@@ -35,6 +36,14 @@ export const ContextMenu = () => {
 	}
 
 	// const create = [<CreateOnBase key={'CreateOnBase'} />]
+	const update = [
+		<MenuItem key={'Update'} onClick={contextHandler('UpdateTableItem')} disabled={data?.data.isIssued}>
+			<ListItemIcon>
+				<EditDocIcon fontSize={20} fill={'#363636'} />
+			</ListItemIcon>
+			Редактировать
+		</MenuItem>,
+	]
 
 	const purpose = [
 		<MenuItem key={'SetPurpose'} onClick={contextHandler('SetPurpose')} disabled={data?.data.isIssued}>
@@ -96,6 +105,7 @@ export const ContextMenu = () => {
 				}
 			>
 				{/* {useCheckPermission(PermRules.Graphite.Write) ? create : null} */}
+				{useCheckPermission(PermRules.Graphite.Write) ? update : null}
 				{useCheckPermission(PermRules.GraphitePurpose.Write) ? purpose : null}
 				{useCheckPermission(PermRules.Issuance.Write) ? produce : null}
 				{useCheckPermission(PermRules.Extending.Write) ? extending : null}
@@ -103,6 +113,7 @@ export const ContextMenu = () => {
 				{useCheckPermission(PermRules.GraphiteNotes.Write) ? notes : null}
 			</Menu>
 
+			<UpdateDialog />
 			<SetPurposeDialog />
 			<SetPlaceDialog />
 			<SetNotesDialog />

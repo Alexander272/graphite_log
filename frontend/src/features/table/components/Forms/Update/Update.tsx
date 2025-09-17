@@ -1,4 +1,4 @@
-import { useEffect, type FC } from 'react'
+import { type FC } from 'react'
 import { Button, Divider, Stack } from '@mui/material'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'react-toastify'
@@ -6,9 +6,8 @@ import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
 import type { ITableItemDTO } from '@/features/table/types/item'
-import { localKeys } from '@/features/table/constants/storage'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
-import { useCreateTableItemMutation } from '@/features/table/tableApiSlice'
+import { useGetTableItemByIdQuery, useUpdateTableItemMutation } from '@/features/table/tableApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { getRealm } from '@/features/realms/realmSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
@@ -31,32 +30,29 @@ const defaultValues: ITableItemDTO = {
 }
 
 type Props = {
-	reset: boolean
+	id: string
 }
 
-export const Create: FC<Props> = ({ reset }) => {
+export const Update: FC<Props> = ({ id }) => {
 	const realm = useAppSelector(getRealm)
 	const dispatch = useAppDispatch()
 
-	const [create, { isLoading }] = useCreateTableItemMutation()
+	const { data, isFetching } = useGetTableItemByIdQuery(id || '', { skip: !id })
+	const [update, { isLoading }] = useUpdateTableItemMutation()
 
 	const methods = useForm<ITableItemDTO>({
-		values: JSON.parse(localStorage.getItem(localKeys.form) || 'null') || defaultValues,
+		values: data?.data || defaultValues,
 	})
 
-	useEffect(() => {
-		if (!reset) return
-		methods.reset(defaultValues)
-	}, [methods, reset])
-
 	const closeHandler = () => {
-		dispatch(changeDialogIsOpen({ variant: 'CreateTableItem', isOpen: false }))
+		dispatch(changeDialogIsOpen({ variant: 'UpdateTableItem', isOpen: false }))
 	}
 
 	const submitHandler = methods.handleSubmit(async form => {
 		console.log('save', form, methods.formState.dirtyFields)
 		if (!realm) return
 
+		form.id = id
 		form.realmId = realm.id
 		form.name = form.name.trim()
 		form.erpName = form.erpName.trim()
@@ -71,9 +67,9 @@ export const Create: FC<Props> = ({ reset }) => {
 		form.notes = form.notes.trim()
 
 		try {
-			await create(form).unwrap()
-			methods.reset(defaultValues)
-			toast.success('Позиция сохранена')
+			await update(form).unwrap()
+			toast.success('Позиция обновлена')
+			closeHandler()
 		} catch (error) {
 			toast.error((error as IFetchError).data.message, { autoClose: false })
 		}
@@ -81,7 +77,7 @@ export const Create: FC<Props> = ({ reset }) => {
 
 	return (
 		<Stack mt={-1.5} position={'relative'}>
-			{isLoading && <BoxFallback />}
+			{isLoading && isFetching ? <BoxFallback /> : null}
 
 			<Stack component={'form'} onSubmit={submitHandler}>
 				<FormProvider {...methods}>

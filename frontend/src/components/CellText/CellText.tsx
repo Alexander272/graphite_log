@@ -28,6 +28,7 @@ export const CellText: FC<Props> = ({ value, align = 'center', color }) => {
 			padding={'6px 6px'}
 			mr={0.5}
 			sx={{
+				fontSize: '0.85rem',
 				overflow: 'hidden',
 				textOverflow: 'ellipsis',
 				whiteSpace: 'nowrap',

@@ -9,6 +9,23 @@ import { apiSlice } from '@/app/apiSlice'
 const issuanceApiSlice = apiSlice.injectEndpoints({
 	overrideExisting: false,
 	endpoints: builder => ({
+		getIssuance: builder.query<{ data: IIssuance[]; total: number }, string>({
+			query: graphite => ({
+				url: API.issuance,
+				method: 'GET',
+				params: new URLSearchParams({ graphite }),
+			}),
+			providesTags: [{ type: 'Table', id: 'ALL' }],
+			onQueryStarted: async (_arg, api) => {
+				try {
+					await api.queryFulfilled
+				} catch (error) {
+					const fetchError = (error as IBaseFetchError).error
+					if (fetchError.status == HttpCodes.NOT_FOUND) return
+					toast.error(fetchError.data.message, { autoClose: false })
+				}
+			},
+		}),
 		getLastIssuance: builder.query<{ data: IIssuance }, string>({
 			query: req => ({
 				url: `${API.issuance}/last`,
@@ -38,17 +55,18 @@ const issuanceApiSlice = apiSlice.injectEndpoints({
 
 		updateIssuance: builder.mutation<null, IIssuanceDTO>({
 			query: data => ({
-				url: API.issuance,
+				url: `${API.issuance}/${data.id}`,
 				method: 'PUT',
 				body: data,
 			}),
 			invalidatesTags: [{ type: 'Table', id: 'ALL' }],
 		}),
 
-		deleteIssuance: builder.mutation<null, string>({
-			query: id => ({
-				url: `${API.issuance}/${id}`,
+		deleteIssuance: builder.mutation<null, { id: string; realm: string }>({
+			query: dto => ({
+				url: `${API.issuance}/${dto.id}`,
 				method: 'DELETE',
+				params: new URLSearchParams({ realm: dto.realm }),
 			}),
 			invalidatesTags: [{ type: 'Table', id: 'ALL' }],
 		}),
@@ -56,6 +74,7 @@ const issuanceApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
+	useGetIssuanceQuery,
 	useGetLastIssuanceQuery,
 	useCreateIssuanceMutation,
 	useUpdateIssuanceMutation,

@@ -19,6 +19,7 @@ type Props = {
 
 const defaultValues: IIssuanceDTO = {
 	id: '',
+	realmId: '',
 	graphiteId: '',
 	issuanceDate: dayjs().toISOString(),
 	isFull: true,

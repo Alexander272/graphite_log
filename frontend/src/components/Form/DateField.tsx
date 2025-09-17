@@ -5,6 +5,7 @@ import dayjs from 'dayjs'
 
 import type { Field } from './type'
 import { DateTextField } from '@/components/DatePicker/DatePicker'
+import { NullDate } from '@/constants/dateFormat'
 
 type Props = {
 	data: Field
@@ -22,7 +23,7 @@ export const DateField: FC<Props> = ({ data, disabled }) => {
 			render={({ field, fieldState: { error } }) => (
 				<DatePicker
 					{...field}
-					value={dayjs(field.value)}
+					value={field.value != NullDate ? dayjs(field.value) : null}
 					onChange={value => {
 						field.onChange(value?.startOf('d').toISOString())
 					}}

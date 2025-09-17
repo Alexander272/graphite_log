@@ -8,11 +8,12 @@ export interface IIssuance {
 
 export interface IIssuanceDTO {
 	id: string
+	realmId: string
 	graphiteId: string
 	issuanceDate: string
 	isFull: boolean
 	isNotFull?: boolean
-	type: 'issuance'
+	type: 'issuance' | 'return'
 	amount: number
 }
 
