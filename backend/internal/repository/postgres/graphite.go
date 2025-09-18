@@ -113,7 +113,7 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 
 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
 		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued,
-		COALESCE(extending, '') AS extending, COALESCE(issuance, '') AS issuance, 
+		COALESCE(extending, '') AS extending, COALESCE(issuance, '') AS issuance, COALESCE(issuance_dates, '{}') as issuance_dates,
 		COUNT(*) OVER() AS total 
 		FROM %s AS g
 		LEFT JOIN LATERAL (SELECT string_agg(act, '; ' ORDER BY date_of_extending DESC) AS extending FROM %s WHERE graphite_id=g.id) AS e ON true
@@ -128,16 +128,21 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 		GraphiteTable, ExtendingTable, IssuanceTable, UserTable,
 		filter, search, order, count, count+1,
 	)
-	data := []*models.Graphite{}
 
-	if err := r.db.SelectContext(ctx, &data, query, params...); err != nil {
+	tmp := []*pq_models.Graphite{}
+	if err := r.db.SelectContext(ctx, &tmp, query, params...); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	data := []*models.Graphite{}
+	for _, v := range tmp {
+		data = append(data, v.ToModel())
 	}
 	return data, nil
 }
 
 func (r *GraphiteRepo) GetById(ctx context.Context, req *models.GetGraphiteByIdDTO) (*models.Graphite, error) {
-	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
+	query := fmt.Sprintf(`SELECT id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
 		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued 
 		FROM %s WHERE id=$1`,
 		GraphiteTable,
@@ -154,12 +159,13 @@ func (r *GraphiteRepo) GetById(ctx context.Context, req *models.GetGraphiteByIdD
 }
 
 func (r *GraphiteRepo) GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error) {
-	reg := regexp.MustCompile("([a-z0-9])([A-Z])")
+	reg := regexp.MustCompile("([a-z0-9])([0-9A-Z])")
 	snake := reg.ReplaceAllString(req.Field, "${1}_${2}")
 	req.Field = strings.ToLower(snake)
 
 	allowedFields := map[string]struct{}{
-		"name": {}, "erp_name": {}, "supplier": {}, "supplier_name": {}, "purpose": {}, "place": {},
+		"name": {}, "erp_name": {}, "supplier": {}, "supplier_batch": {}, "supplier_name": {}, "document": {},
+		"purpose": {}, "place": {}, "number_1c": {}, "act": {},
 	}
 
 	if _, exist := allowedFields[req.Field]; !exist {

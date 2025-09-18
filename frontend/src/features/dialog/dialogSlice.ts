@@ -3,6 +3,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 export type DialogVariants =
 	| 'CreateTableItem'
+	| 'UpdateTableItem'
 	| 'EditTableItem'
 	| 'SetPurpose'
 	| 'AddExtending'
@@ -12,6 +13,7 @@ export type DialogVariants =
 	| 'Return'
 	| 'Access'
 	| 'History'
+	| 'Changes'
 
 interface IDialogOptions {
 	isOpen: boolean

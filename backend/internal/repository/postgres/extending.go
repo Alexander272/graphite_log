@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
@@ -18,6 +20,7 @@ func NewExtendingRepo(db *sqlx.DB) *ExtendingRepo {
 }
 
 type Extending interface {
+	GetById(ctx context.Context, req *models.GetExtendingByIdDTO) (*models.Extending, error)
 	GetByGraphiteId(ctx context.Context, graphiteId string) ([]*models.Extending, error)
 	Create(ctx context.Context, dto *models.ExtendingDTO) error
 	CreateSeveral(ctx context.Context, dto []*models.ExtendingDTO) error
@@ -25,8 +28,24 @@ type Extending interface {
 	Delete(ctx context.Context, dto *models.DeleteExtendingDTO) error
 }
 
+func (r *ExtendingRepo) GetById(ctx context.Context, req *models.GetExtendingByIdDTO) (*models.Extending, error) {
+	query := fmt.Sprintf(`SELECT id, graphite_id, act, date_of_extending, period_of_extending FROM %s 
+		WHERE id=$1`,
+		ExtendingTable,
+	)
+	data := &models.Extending{}
+
+	if err := r.db.GetContext(ctx, data, query, req.Id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, models.ErrNoRows
+		}
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return data, nil
+}
+
 func (r *ExtendingRepo) GetByGraphiteId(ctx context.Context, graphiteId string) ([]*models.Extending, error) {
-	query := fmt.Sprintf(`SELECT id, act, date_of_extending, period_of_extending FROM %s WHERE graphite_id=$1 
+	query := fmt.Sprintf(`SELECT id, graphite_id, act, date_of_extending, period_of_extending FROM %s WHERE graphite_id=$1 
 		ORDER BY date_of_extending DESC`,
 		ExtendingTable,
 	)

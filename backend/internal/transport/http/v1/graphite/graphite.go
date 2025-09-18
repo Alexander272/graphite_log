@@ -160,19 +160,19 @@ func (h *Handler) update(c *gin.Context) {
 		return
 	}
 
-	dto := &models.GraphiteDTO{}
-	if err := c.BindJSON(dto); err != nil {
-		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
-		return
-	}
-	dto.Id = id
-
 	u, exists := c.Get(constants.CtxUser)
 	if !exists {
 		response.NewErrorResponse(c, http.StatusUnauthorized, "empty user", "Сессия не найдена")
 		return
 	}
 	user := u.(models.User)
+
+	dto := &models.GraphiteDTO{UserId: user.Id, UserName: user.Name}
+	if err := c.BindJSON(dto); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
+		return
+	}
+	dto.Id = id
 
 	if err := h.service.Update(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
@@ -202,6 +202,8 @@ func (h *Handler) setPurpose(c *gin.Context) {
 		return
 	}
 	user := u.(models.User)
+	dto.UserId = user.Id
+	dto.UserName = user.Name
 
 	if err := h.service.SetPurpose(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
@@ -231,6 +233,8 @@ func (h *Handler) setPlace(c *gin.Context) {
 		return
 	}
 	user := u.(models.User)
+	dto.UserId = user.Id
+	dto.UserName = user.Name
 
 	if err := h.service.SetPlace(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())

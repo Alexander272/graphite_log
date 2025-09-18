@@ -96,7 +96,7 @@ export const Columns: readonly IColumn[] = Object.freeze([
 		type: 'text',
 		width: 150,
 		allowSort: true,
-		filter: 'text',
+		filter: 'date',
 	},
 	{
 		id: 'd356d1e2-7cf4-4e68-8201-190fb2fccc7e',

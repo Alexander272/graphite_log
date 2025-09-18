@@ -75,6 +75,17 @@ const tableApiSlice = apiSlice.injectEndpoints({
 				{ type: 'Table', id: 'UNIQUE' },
 			],
 		}),
+		updateTableItem: builder.mutation<null, ITableItemDTO>({
+			query: data => ({
+				url: `${API.table.base}/${data.id}`,
+				method: 'PUT',
+				body: data,
+			}),
+			invalidatesTags: [
+				{ type: 'Table', id: 'ALL' },
+				{ type: 'Table', id: 'UNIQUE' },
+			],
+		}),
 
 		setPurpose: builder.mutation<null, ISetPurposeDTO>({
 			query: data => ({
@@ -119,6 +130,7 @@ export const {
 	useGetUniqueDataQuery,
 	useLazyGetUniqueDataQuery,
 	useCreateTableItemMutation,
+	useUpdateTableItemMutation,
 	useSetPurposeMutation,
 	useSetPlaceMutation,
 	useSetNotesMutation,

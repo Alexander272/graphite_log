@@ -29,4 +29,5 @@ export const API = {
 	roles: '/roles' as const,
 	accesses: '/accesses' as const,
 	import: '/import' as const,
+	changes: '/changes' as const,
 }

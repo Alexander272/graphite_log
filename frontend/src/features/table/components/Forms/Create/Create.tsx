@@ -6,13 +6,13 @@ import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
 import type { ITableItemDTO } from '@/features/table/types/item'
+import { localKeys } from '@/features/table/constants/storage'
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
 import { useCreateTableItemMutation } from '@/features/table/tableApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { getRealm } from '@/features/realms/realmSlice'
-import { Inputs } from './Inputs'
-import { localKeys } from '@/features/table/constants/storage'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
+import { Inputs } from './Inputs'
 
 const defaultValues: ITableItemDTO = {
 	dateOfReceipt: dayjs().toISOString(),

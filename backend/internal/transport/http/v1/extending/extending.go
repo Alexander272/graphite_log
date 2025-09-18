@@ -11,6 +11,7 @@ import (
 	"github.com/Alexander272/graphite_log/backend/pkg/error_bot"
 	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type ExtendingHandlers struct {
@@ -28,7 +29,7 @@ func Register(api *gin.RouterGroup, service services.Extending, middleware *midd
 
 	extending := api.Group("/extending", middleware.CheckPermissions(constants.Extending, constants.Read))
 	{
-		extending.GET(":graphite", handlers.getByGraphiteId)
+		extending.GET("", handlers.getByGraphiteId)
 
 		write := extending.Group("", middleware.CheckPermissions(constants.Extending, constants.Write))
 		{
@@ -40,7 +41,7 @@ func Register(api *gin.RouterGroup, service services.Extending, middleware *midd
 }
 
 func (h *ExtendingHandlers) getByGraphiteId(c *gin.Context) {
-	graphiteId := c.Param("graphite")
+	graphiteId := c.Query("graphite")
 	if graphiteId == "" {
 		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Id реагента не задан")
 		return
@@ -80,7 +81,14 @@ func (h *ExtendingHandlers) update(c *gin.Context) {
 		return
 	}
 
-	dto := &models.ExtendingDTO{}
+	u, exists := c.Get(constants.CtxUser)
+	if !exists {
+		response.NewErrorResponse(c, http.StatusUnauthorized, "empty user", "Сессия не найдена")
+		return
+	}
+	user := u.(models.User)
+
+	dto := &models.ExtendingDTO{UserId: user.Id, UserName: user.Name}
 	if err := c.BindJSON(dto); err != nil {
 		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
 		return
@@ -103,7 +111,20 @@ func (h *ExtendingHandlers) delete(c *gin.Context) {
 		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Id не задан")
 		return
 	}
-	dto := &models.DeleteExtendingDTO{Id: id}
+	graphite := c.Query("graphite")
+	if err := uuid.Validate(graphite); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Id не корректен")
+		return
+	}
+
+	u, exists := c.Get(constants.CtxUser)
+	if !exists {
+		response.NewErrorResponse(c, http.StatusUnauthorized, "empty user", "Сессия не найдена")
+		return
+	}
+	user := u.(models.User)
+
+	dto := &models.DeleteExtendingDTO{Id: id, UserId: user.Id, UserName: user.Name, GraphiteId: graphite}
 
 	if err := h.service.Delete(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())

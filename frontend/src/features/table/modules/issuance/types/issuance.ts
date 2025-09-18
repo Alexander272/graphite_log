@@ -1,5 +1,6 @@
 export interface IIssuance {
 	id: string
+	graphiteId: string
 	issuanceDate: string
 	isFull: boolean
 	amount: number
@@ -12,7 +13,7 @@ export interface IIssuanceDTO {
 	issuanceDate: string
 	isFull: boolean
 	isNotFull?: boolean
-	type: 'issuance'
+	type: 'issuance' | 'return'
 	amount: number
 }
 

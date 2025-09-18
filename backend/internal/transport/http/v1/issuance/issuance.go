@@ -120,13 +120,12 @@ func (h *Handler) update(c *gin.Context) {
 	}
 	user := u.(models.User)
 
-	dto := &models.IssuanceForProdDTO{}
+	dto := &models.IssuanceForProdDTO{UserId: user.Id, UserName: user.Name}
 	if err := c.BindJSON(dto); err != nil {
 		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
 		return
 	}
 	dto.Id = id
-	dto.UserId = user.Id
 
 	if err := h.service.Update(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
@@ -144,7 +143,20 @@ func (h *Handler) delete(c *gin.Context) {
 		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Id не корректен")
 		return
 	}
-	dto := &models.DelIssuanceForProdDTO{Id: id}
+	graphite := c.Query("graphite")
+	if err := uuid.Validate(graphite); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Id не корректен")
+		return
+	}
+
+	u, exists := c.Get(constants.CtxUser)
+	if !exists {
+		response.NewErrorResponse(c, http.StatusUnauthorized, "empty user", "Сессия не найдена")
+		return
+	}
+	user := u.(models.User)
+
+	dto := &models.DelIssuanceForProdDTO{Id: id, UserId: user.Id, UserName: user.Name, GraphiteId: graphite}
 
 	if err := h.service.Delete(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())

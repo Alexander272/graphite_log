@@ -10,11 +10,12 @@ import (
 )
 
 type GraphiteService struct {
-	repo repository.Graphite
+	repo    repository.Graphite
+	changes Changes
 }
 
-func NewGraphiteService(repo repository.Graphite) *GraphiteService {
-	return &GraphiteService{repo: repo}
+func NewGraphiteService(repo repository.Graphite, changes Changes) *GraphiteService {
+	return &GraphiteService{repo: repo, changes: changes}
 }
 
 type Graphite interface {
@@ -83,6 +84,24 @@ func (s *GraphiteService) CreateSeveral(ctx context.Context, dto []*models.Graph
 }
 
 func (s *GraphiteService) Update(ctx context.Context, dto *models.GraphiteDTO) error {
+	cnd, err := s.GetById(ctx, &models.GetGraphiteByIdDTO{Id: dto.Id})
+	if err != nil {
+		return err
+	}
+
+	changedDto := &models.NewChangeDTO{
+		RealmId:  dto.RealmId,
+		UserId:   dto.UserId,
+		UserName: dto.UserName,
+		Section:  "graphite",
+		ValueId:  dto.Id,
+		Original: cnd,
+		Changed:  dto,
+	}
+	if err := s.changes.AddChange(ctx, changedDto); err != nil {
+		return err
+	}
+
 	if err := s.repo.Update(ctx, dto); err != nil {
 		return fmt.Errorf("failed to update graphite. error: %w", err)
 	}
@@ -97,6 +116,25 @@ func (s *GraphiteService) SetIssued(ctx context.Context, dto *models.SetGraphite
 }
 
 func (s *GraphiteService) SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error {
+	cnd, err := s.GetById(ctx, &models.GetGraphiteByIdDTO{Id: dto.Id})
+	if err != nil {
+		return err
+	}
+
+	if cnd.Purpose != "" {
+		changedDto := &models.NewChangeDTO{
+			UserId:   dto.UserId,
+			UserName: dto.UserName,
+			Section:  "purpose",
+			ValueId:  dto.Id,
+			Original: cnd.Purpose,
+			Changed:  dto.Purpose,
+		}
+		if err := s.changes.AddChange(ctx, changedDto); err != nil {
+			return err
+		}
+	}
+
 	if err := s.repo.SetPurpose(ctx, dto); err != nil {
 		return fmt.Errorf("failed to set graphite purpose. error: %w", err)
 	}
@@ -104,6 +142,25 @@ func (s *GraphiteService) SetPurpose(ctx context.Context, dto *models.SetGraphit
 }
 
 func (s *GraphiteService) SetPlace(ctx context.Context, dto *models.SetGraphitePlaceDTO) error {
+	cnd, err := s.GetById(ctx, &models.GetGraphiteByIdDTO{Id: dto.Id})
+	if err != nil {
+		return err
+	}
+
+	if cnd.Place != "" {
+		changedDto := &models.NewChangeDTO{
+			UserId:   dto.UserId,
+			UserName: dto.UserName,
+			Section:  "place",
+			ValueId:  dto.Id,
+			Original: cnd.Place,
+			Changed:  dto.Place,
+		}
+		if err := s.changes.AddChange(ctx, changedDto); err != nil {
+			return err
+		}
+	}
+
 	if err := s.repo.SetPlace(ctx, dto); err != nil {
 		return fmt.Errorf("failed to set graphite place. error: %w", err)
 	}

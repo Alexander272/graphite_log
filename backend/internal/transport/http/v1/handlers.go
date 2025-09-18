@@ -6,6 +6,7 @@ import (
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/middleware"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/accesses"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/auth"
+	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/changes"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/extending"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/graphite"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/import_file"
@@ -50,4 +51,5 @@ func (h *Handler) Init(group *gin.RouterGroup) {
 	extending.Register(secure, h.services.Extending, h.middleware)
 	issuance.Register(secure, h.services.IssuanceForProd, h.middleware)
 	import_file.Register(secure, h.services.Import, h.middleware)
+	changes.Register(secure, h.services.Changes, h.middleware)
 }
