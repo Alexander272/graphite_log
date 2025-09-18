@@ -12,9 +12,11 @@ import { ExchangeIcon } from '@/components/Icons/ExchangeIcon'
 import { OperationIcon } from '@/components/Icons/OperationIcon'
 import { IntegrationIcon } from '@/components/Icons/IntegrationIcon'
 import { ReplyIcon } from '@/components/Icons/ReplyIcon'
+import { HistoryIcon } from '@/components/Icons/HistoryIcon'
 import { ExtendingDialog } from '../../modules/extending/components/Dialog/Extending'
 import { IssuanceDialog } from '../../modules/issuance/components/Dialog/Issuance'
 import { ReturnDialog } from '../../modules/issuance/components/Dialog/Return'
+import { ChangesDialog } from '../../modules/changes/components/Dialog'
 import { SetPurposeDialog } from '../Dialogs/SetPurpose'
 import { SetPlaceDialog } from '../Dialogs/SetPlace'
 import { SetNotesDialog } from '../Dialogs/SetNotes'
@@ -61,7 +63,11 @@ export const ContextMenu = () => {
 			</ListItemIcon>
 			Выдать в производство
 		</MenuItem>,
-		<MenuItem key={'Return'} onClick={contextHandler('Return')} disabled={data?.data.markOnRelease == ''}>
+		<MenuItem
+			key={'Return'}
+			onClick={contextHandler('Return')}
+			disabled={!data?.data.markOnRelease || data?.data.markOnRelease == ''}
+		>
 			<ListItemIcon>
 				<ReplyIcon fontSize={18} fill={'#363636'} />
 			</ListItemIcon>
@@ -111,6 +117,13 @@ export const ContextMenu = () => {
 				{useCheckPermission(PermRules.Extending.Write) ? extending : null}
 				{useCheckPermission(PermRules.GraphitePlace.Write) ? place : null}
 				{useCheckPermission(PermRules.GraphiteNotes.Write) ? notes : null}
+
+				<MenuItem onClick={contextHandler('Changes')}>
+					<ListItemIcon>
+						<HistoryIcon fontSize={18} fill={'#363636'} />
+					</ListItemIcon>
+					История изменений
+				</MenuItem>
 			</Menu>
 
 			<UpdateDialog />
@@ -120,6 +133,7 @@ export const ContextMenu = () => {
 			<ExtendingDialog />
 			<IssuanceDialog />
 			<ReturnDialog />
+			<ChangesDialog />
 		</>
 	)
 }

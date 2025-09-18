@@ -19,7 +19,6 @@ type Props = {
 
 const defaultValues: IExtendingDTO = {
 	id: '',
-	realmId: '',
 	graphiteId: '',
 	act: '',
 	date: dayjs().toISOString(),

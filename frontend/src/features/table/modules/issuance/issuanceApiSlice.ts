@@ -62,11 +62,11 @@ const issuanceApiSlice = apiSlice.injectEndpoints({
 			invalidatesTags: [{ type: 'Table', id: 'ALL' }],
 		}),
 
-		deleteIssuance: builder.mutation<null, { id: string; realm: string; graphite: string }>({
+		deleteIssuance: builder.mutation<null, { id: string; graphite: string }>({
 			query: dto => ({
 				url: `${API.issuance}/${dto.id}`,
 				method: 'DELETE',
-				params: new URLSearchParams({ realm: dto.realm, graphite: dto.graphite }),
+				params: new URLSearchParams({ graphite: dto.graphite }),
 			}),
 			invalidatesTags: [{ type: 'Table', id: 'ALL' }],
 		}),

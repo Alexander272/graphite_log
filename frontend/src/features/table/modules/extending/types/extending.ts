@@ -8,7 +8,6 @@ export interface IExtending {
 
 export interface IExtendingDTO {
 	id: string
-	realmId: string
 	graphiteId: string
 	act: string
 	date: string

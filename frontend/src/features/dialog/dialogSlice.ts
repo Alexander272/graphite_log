@@ -13,6 +13,7 @@ export type DialogVariants =
 	| 'Return'
 	| 'Access'
 	| 'History'
+	| 'Changes'
 
 interface IDialogOptions {
 	isOpen: boolean

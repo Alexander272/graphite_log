@@ -6,10 +6,9 @@ import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
 import type { IExtending, IExtendingDTO } from '../../types/extending'
-import { useAppDispatch, useAppSelector } from '@/hooks/redux'
+import { useAppDispatch } from '@/hooks/redux'
 import { useDeleteExtendingMutation, useUpdateExtendingMutation } from '../../extendingApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
-import { getRealm } from '@/features/realms/realmSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
 import { Confirm } from '@/components/Confirm/Confirm'
 import { DeleteIcon } from '@/components/Icons/DeleteIcon'
@@ -21,7 +20,6 @@ type Props = {
 
 const defaultValues: IExtendingDTO = {
 	id: '',
-	realmId: '',
 	graphiteId: '',
 	act: '',
 	date: dayjs().toISOString(),
@@ -29,7 +27,6 @@ const defaultValues: IExtendingDTO = {
 }
 
 export const EditExtending: FC<Props> = ({ data }) => {
-	const realm = useAppSelector(getRealm)
 	const dispatch = useAppDispatch()
 
 	const { palette } = useTheme()
@@ -48,7 +45,6 @@ export const EditExtending: FC<Props> = ({ data }) => {
 	const submitHandler = methods.handleSubmit(async form => {
 		console.log('save', form, methods.formState.dirtyFields)
 
-		form.realmId = realm?.id || ''
 		form.act = form.act.trim() ? `${form.act.trim()} от ${dayjs(form.date).format('DD.MM.YYYY')}` : ''
 
 		try {
@@ -62,7 +58,7 @@ export const EditExtending: FC<Props> = ({ data }) => {
 	const deleteHandler = async () => {
 		console.log('delete', data)
 		try {
-			await remove({ id: data.id, realm: realm?.id || '', graphite: data.graphiteId }).unwrap()
+			await remove({ id: data.id, graphite: data.graphiteId }).unwrap()
 			closeHandler()
 		} catch (error) {
 			toast.error((error as IFetchError).data.message, { autoClose: false })

@@ -1,3 +1,4 @@
+import { useState, type FC } from 'react'
 import { IconButton, Stack, Tab, Tabs } from '@mui/material'
 
 import { useAppDispatch, useAppSelector } from '@/hooks/redux'
@@ -5,7 +6,6 @@ import { changeDialogIsOpen, getDialogState } from '@/features/dialog/dialogSlic
 import { Dialog } from '@/features/dialog/components/Dialog'
 import { TimesIcon } from '@/components/Icons/TimesIcon'
 import { Update } from '../Forms/Update/Update'
-import { useState, type FC } from 'react'
 import { EditExtendingList } from '../../modules/extending/components/Forms/EditExtendingList'
 import { EditIssuanceList } from '../../modules/issuance/components/Forms/EditIssuanceList'
 

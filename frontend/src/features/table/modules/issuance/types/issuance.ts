@@ -9,7 +9,6 @@ export interface IIssuance {
 
 export interface IIssuanceDTO {
 	id: string
-	realmId: string
 	graphiteId: string
 	issuanceDate: string
 	isFull: boolean

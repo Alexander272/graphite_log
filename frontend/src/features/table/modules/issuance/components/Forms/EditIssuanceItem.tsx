@@ -6,10 +6,9 @@ import dayjs from 'dayjs'
 
 import type { IFetchError } from '@/app/types/error'
 import type { IIssuance, IIssuanceDTO } from '../../types/issuance'
-import { useAppDispatch, useAppSelector } from '@/hooks/redux'
+import { useAppDispatch } from '@/hooks/redux'
 import { useDeleteIssuanceMutation, useUpdateIssuanceMutation } from '../../issuanceApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
-import { getRealm } from '@/features/realms/realmSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
 import { DeleteIcon } from '@/components/Icons/DeleteIcon'
 import { Confirm } from '@/components/Confirm/Confirm'
@@ -22,7 +21,6 @@ type Props = {
 
 const defaultValues: IIssuanceDTO = {
 	id: '',
-	realmId: '',
 	graphiteId: '',
 	issuanceDate: dayjs().toISOString(),
 	isFull: true,
@@ -32,7 +30,6 @@ const defaultValues: IIssuanceDTO = {
 }
 
 export const EditIssuanceItem: FC<Props> = ({ data }) => {
-	const realm = useAppSelector(getRealm)
 	const dispatch = useAppDispatch()
 
 	const { palette } = useTheme()
@@ -51,8 +48,6 @@ export const EditIssuanceItem: FC<Props> = ({ data }) => {
 	const submitHandler = methods.handleSubmit(async form => {
 		console.log('save', form, methods.formState.dirtyFields)
 
-		form.realmId = realm?.id || ''
-
 		try {
 			await update(form).unwrap()
 			closeHandler()
@@ -65,7 +60,7 @@ export const EditIssuanceItem: FC<Props> = ({ data }) => {
 		console.log('delete', data)
 
 		try {
-			await remove({ id: data.id, realm: realm?.id || '', graphite: data.graphiteId }).unwrap()
+			await remove({ id: data.id, graphite: data.graphiteId }).unwrap()
 			closeHandler()
 		} catch (error) {
 			toast.error((error as IFetchError).data.message, { autoClose: false })
