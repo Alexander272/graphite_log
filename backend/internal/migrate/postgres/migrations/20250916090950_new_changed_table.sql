@@ -3,7 +3,7 @@
 CREATE TABLE IF NOT EXISTS public.changed
 (
     id uuid NOT NULL,
-    realm_id uuid NOT NULL,
+    realm_id uuid,
     user_id uuid,
     user_name text COLLATE pg_catalog."default",
     section text COLLATE pg_catalog."default" NOT NULL,

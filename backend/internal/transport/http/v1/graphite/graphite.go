@@ -202,6 +202,8 @@ func (h *Handler) setPurpose(c *gin.Context) {
 		return
 	}
 	user := u.(models.User)
+	dto.UserId = user.Id
+	dto.UserName = user.Name
 
 	if err := h.service.SetPurpose(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
@@ -231,6 +233,8 @@ func (h *Handler) setPlace(c *gin.Context) {
 		return
 	}
 	user := u.(models.User)
+	dto.UserId = user.Id
+	dto.UserName = user.Name
 
 	if err := h.service.SetPlace(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())

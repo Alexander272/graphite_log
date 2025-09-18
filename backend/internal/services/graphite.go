@@ -11,11 +11,11 @@ import (
 
 type GraphiteService struct {
 	repo    repository.Graphite
-	changed Changed
+	changes Changes
 }
 
-func NewGraphiteService(repo repository.Graphite, changed Changed) *GraphiteService {
-	return &GraphiteService{repo: repo, changed: changed}
+func NewGraphiteService(repo repository.Graphite, changes Changes) *GraphiteService {
+	return &GraphiteService{repo: repo, changes: changes}
 }
 
 type Graphite interface {
@@ -98,7 +98,7 @@ func (s *GraphiteService) Update(ctx context.Context, dto *models.GraphiteDTO) e
 		Original: cnd,
 		Changed:  dto,
 	}
-	if err := s.changed.AddChange(ctx, changedDto); err != nil {
+	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err
 	}
 
@@ -116,6 +116,25 @@ func (s *GraphiteService) SetIssued(ctx context.Context, dto *models.SetGraphite
 }
 
 func (s *GraphiteService) SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error {
+	cnd, err := s.GetById(ctx, &models.GetGraphiteByIdDTO{Id: dto.Id})
+	if err != nil {
+		return err
+	}
+
+	if cnd.Purpose != "" {
+		changedDto := &models.NewChangeDTO{
+			UserId:   dto.UserId,
+			UserName: dto.UserName,
+			Section:  "purpose",
+			ValueId:  dto.Id,
+			Original: cnd.Purpose,
+			Changed:  dto.Purpose,
+		}
+		if err := s.changes.AddChange(ctx, changedDto); err != nil {
+			return err
+		}
+	}
+
 	if err := s.repo.SetPurpose(ctx, dto); err != nil {
 		return fmt.Errorf("failed to set graphite purpose. error: %w", err)
 	}
@@ -123,6 +142,25 @@ func (s *GraphiteService) SetPurpose(ctx context.Context, dto *models.SetGraphit
 }
 
 func (s *GraphiteService) SetPlace(ctx context.Context, dto *models.SetGraphitePlaceDTO) error {
+	cnd, err := s.GetById(ctx, &models.GetGraphiteByIdDTO{Id: dto.Id})
+	if err != nil {
+		return err
+	}
+
+	if cnd.Place != "" {
+		changedDto := &models.NewChangeDTO{
+			UserId:   dto.UserId,
+			UserName: dto.UserName,
+			Section:  "place",
+			ValueId:  dto.Id,
+			Original: cnd.Place,
+			Changed:  dto.Place,
+		}
+		if err := s.changes.AddChange(ctx, changedDto); err != nil {
+			return err
+		}
+	}
+
 	if err := s.repo.SetPlace(ctx, dto); err != nil {
 		return fmt.Errorf("failed to set graphite place. error: %w", err)
 	}

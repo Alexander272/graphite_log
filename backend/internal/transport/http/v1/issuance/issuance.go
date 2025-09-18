@@ -143,9 +143,9 @@ func (h *Handler) delete(c *gin.Context) {
 		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Id не корректен")
 		return
 	}
-	realm := c.Query("realm")
-	if err := uuid.Validate(realm); err != nil {
-		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Realm не корректен")
+	graphite := c.Query("graphite")
+	if err := uuid.Validate(graphite); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Id не корректен")
 		return
 	}
 
@@ -156,7 +156,7 @@ func (h *Handler) delete(c *gin.Context) {
 	}
 	user := u.(models.User)
 
-	dto := &models.DelIssuanceForProdDTO{Id: id, UserId: user.Id, UserName: user.Name, RealmId: realm}
+	dto := &models.DelIssuanceForProdDTO{Id: id, UserId: user.Id, UserName: user.Name, GraphiteId: graphite}
 
 	if err := h.service.Delete(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())

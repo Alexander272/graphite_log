@@ -21,8 +21,8 @@ type GetIssuanceByIdDTO struct {
 }
 
 type IssuanceForProdDTO struct {
-	Id           string    `json:"id" db:"id"`
-	RealmId      string    `json:"realmId" db:"realm_id"`
+	Id string `json:"id" db:"id"`
+	// RealmId      string    `json:"realmId" db:"realm_id"`
 	GraphiteId   string    `json:"graphiteId" db:"graphite_id"`
 	IssuanceDate time.Time `json:"issuanceDate" db:"issuance_date"`
 	UserId       string    `json:"userId" db:"user_id"`

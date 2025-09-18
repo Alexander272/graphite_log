@@ -11,14 +11,14 @@ import (
 type ExtendingService struct {
 	repo     repository.Extending
 	graphite Graphite
-	changed  Changed
+	changes  Changes
 }
 
-func NewExtendingService(repo repository.Extending, graphite Graphite, changed Changed) *ExtendingService {
+func NewExtendingService(repo repository.Extending, graphite Graphite, changes Changes) *ExtendingService {
 	return &ExtendingService{
 		repo:     repo,
 		graphite: graphite,
-		changed:  changed,
+		changes:  changes,
 	}
 }
 
@@ -85,7 +85,7 @@ func (s *ExtendingService) Update(ctx context.Context, dto *models.ExtendingDTO)
 		Original: cnd,
 		Changed:  dto,
 	}
-	if err := s.changed.AddChange(ctx, changedDto); err != nil {
+	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err
 	}
 
@@ -110,7 +110,7 @@ func (s *ExtendingService) Delete(ctx context.Context, dto *models.DeleteExtendi
 		Original: cnd,
 		Changed:  "",
 	}
-	if err := s.changed.AddChange(ctx, changedDto); err != nil {
+	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err
 	}
 

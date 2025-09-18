@@ -12,14 +12,14 @@ import (
 type IssuanceService struct {
 	repo     repository.IssuanceForProd
 	graphite Graphite
-	changed  Changed
+	changes  Changes
 }
 
-func NewIssuanceService(repo repository.IssuanceForProd, graphite Graphite, changed Changed) *IssuanceService {
+func NewIssuanceService(repo repository.IssuanceForProd, graphite Graphite, changes Changes) *IssuanceService {
 	return &IssuanceService{
 		repo:     repo,
 		graphite: graphite,
-		changed:  changed,
+		changes:  changes,
 	}
 }
 
@@ -102,7 +102,6 @@ func (s *IssuanceService) Update(ctx context.Context, dto *models.IssuanceForPro
 	}
 
 	changedDto := &models.NewChangeDTO{
-		RealmId:  dto.RealmId,
 		UserId:   dto.UserId,
 		UserName: dto.UserName,
 		Section:  "issuance",
@@ -110,7 +109,7 @@ func (s *IssuanceService) Update(ctx context.Context, dto *models.IssuanceForPro
 		Original: cnd,
 		Changed:  dto,
 	}
-	if err := s.changed.AddChange(ctx, changedDto); err != nil {
+	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err
 	}
 
@@ -127,7 +126,6 @@ func (s *IssuanceService) Delete(ctx context.Context, dto *models.DelIssuanceFor
 	}
 
 	changedDto := &models.NewChangeDTO{
-		RealmId:  dto.RealmId,
 		UserId:   dto.UserId,
 		UserName: dto.UserName,
 		Section:  "issuance",
@@ -135,7 +133,7 @@ func (s *IssuanceService) Delete(ctx context.Context, dto *models.DelIssuanceFor
 		Original: cnd,
 		Changed:  "",
 	}
-	if err := s.changed.AddChange(ctx, changedDto); err != nil {
+	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err
 	}
 

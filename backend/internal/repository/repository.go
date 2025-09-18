@@ -37,8 +37,8 @@ type IssuanceForProd interface {
 type Notification interface {
 	postgres.Notification
 }
-type Changed interface {
-	postgres.Changed
+type Changes interface {
+	postgres.Changes
 }
 
 type Repository struct {
@@ -54,7 +54,7 @@ type Repository struct {
 	IssuanceForProd
 
 	Notification
-	Changed
+	Changes
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -71,6 +71,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 		IssuanceForProd: postgres.NewIssuanceRepo(db),
 
 		Notification: postgres.NewNotificationRepo(db),
-		Changed:      postgres.NewChangedRepo(db),
+		Changes:      postgres.NewChangesRepo(db),
 	}
 }

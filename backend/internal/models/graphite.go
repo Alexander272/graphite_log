@@ -43,9 +43,9 @@ type Graphite struct {
 }
 
 type GraphiteDTO struct {
-	Id             string `json:"id" db:"id"`
-	UserId         string
-	UserName       string
+	Id             string    `json:"id" db:"id"`
+	UserId         string    `json:"-"`
+	UserName       string    `json:"-"`
 	RealmId        string    `json:"realmId" db:"realm_id" binding:"required"`
 	DateOfReceipt  time.Time `json:"dateOfReceipt" db:"date_of_receipt" binding:"required"`
 	Name           string    `json:"name" db:"name" binding:"required"`
@@ -76,12 +76,16 @@ type SetGraphiteIssuedDTO struct {
 }
 
 type SetGraphitePurposeDTO struct {
-	Id      string `json:"id" db:"id" binding:"required"`
-	Purpose string `json:"purpose" db:"purpose"`
+	Id       string `json:"id" db:"id" binding:"required"`
+	Purpose  string `json:"purpose" db:"purpose"`
+	UserId   string
+	UserName string
 }
 type SetGraphitePlaceDTO struct {
-	Id    string `json:"id" db:"id" binding:"required"`
-	Place string `json:"place" db:"place"`
+	Id       string `json:"id" db:"id" binding:"required"`
+	Place    string `json:"place" db:"place"`
+	UserId   string
+	UserName string
 }
 type SetGraphiteNotesDTO struct {
 	Id    string `json:"id" db:"id" binding:"required"`
