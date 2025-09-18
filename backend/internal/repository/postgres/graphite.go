@@ -113,7 +113,7 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 
 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
 		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued,
-		COALESCE(extending, '') AS extending, COALESCE(issuance, '') AS issuance, 
+		COALESCE(extending, '') AS extending, COALESCE(issuance, '') AS issuance, COALESCE(issuance_dates, '{}') as issuance_dates,
 		COUNT(*) OVER() AS total 
 		FROM %s AS g
 		LEFT JOIN LATERAL (SELECT string_agg(act, '; ' ORDER BY date_of_extending DESC) AS extending FROM %s WHERE graphite_id=g.id) AS e ON true
@@ -128,10 +128,15 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 		GraphiteTable, ExtendingTable, IssuanceTable, UserTable,
 		filter, search, order, count, count+1,
 	)
-	data := []*models.Graphite{}
 
-	if err := r.db.SelectContext(ctx, &data, query, params...); err != nil {
+	tmp := []*pq_models.Graphite{}
+	if err := r.db.SelectContext(ctx, &tmp, query, params...); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+
+	data := []*models.Graphite{}
+	for _, v := range tmp {
+		data = append(data, v.ToModel())
 	}
 	return data, nil
 }
