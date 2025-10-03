@@ -10,12 +10,40 @@ export default defineConfig({
 			plugins: [['@swc/plugin-emotion', {}]],
 		}),
 		VitePWA({
-			registerType: 'autoUpdate', // Automatically update the service worker
-			// Other PWA options like manifest, workbox configuration, etc.
+			// devOptions: {
+			// 	enabled: true,
+			// },
+			// strategies: 'injectManifest',
+			// srcDir: 'src/serviceWorkers',
+			// filename: 'sw.ts',
+			registerType: 'autoUpdate',
 			manifest: {
+				id: 'graphite_log',
 				name: 'ГрафитЛог',
 				short_name: 'ГрафитЛог',
+				description: 'Журнал прихода графита',
 				lang: 'ru',
+				theme_color: '#fafafa',
+				background_color: '#fafafa',
+				icons: [
+					{
+						src: 'favicon.ico',
+						type: 'image/x-icon',
+						sizes: '100x97',
+					},
+					{
+						src: 'logo192.webp',
+						type: 'image/webp',
+						sizes: '192x192',
+					},
+				],
+				screenshots: [
+					{
+						src: 'wide.png',
+						sizes: '1920x854',
+						type: 'image/png',
+					},
+				],
 			},
 		}),
 	],
