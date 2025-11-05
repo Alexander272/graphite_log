@@ -20,7 +20,8 @@ export interface ITableItem {
 	document: string
 	supplier: string
 	supplierName: string
-	markOnRelease: string
+	// markOnRelease: string
+	issuanceForProd: string
 	isIssued: boolean
 	purpose: string
 	number1c: string

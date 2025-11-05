@@ -143,9 +143,12 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 
 func (r *GraphiteRepo) GetById(ctx context.Context, req *models.GetGraphiteByIdDTO) (*models.Graphite, error) {
 	query := fmt.Sprintf(`SELECT id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued 
-		FROM %s WHERE id=$1`,
-		GraphiteTable,
+		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued, 
+		COALESCE(issuance, '') AS issuance 
+		FROM %s AS g
+		LEFT JOIN LATERAL (SELECT COALESCE(issuance_date::text, '') AS issuance FROM %s WHERE graphite_id=g.id ORDER BY issuance_date DESC LIMIT 1) AS i ON TRUE
+		WHERE id=$1`,
+		GraphiteTable, IssuanceTable,
 	)
 	data := &models.Graphite{}
 

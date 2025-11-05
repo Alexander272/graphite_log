@@ -66,7 +66,7 @@ export const ContextMenu = () => {
 		<MenuItem
 			key={'Return'}
 			onClick={contextHandler('Return')}
-			disabled={!data?.data.markOnRelease || data?.data.markOnRelease == ''}
+			disabled={!data?.data.issuanceForProd || data?.data.issuanceForProd == ''}
 		>
 			<ListItemIcon>
 				<ReplyIcon fontSize={18} fill={'#363636'} />
