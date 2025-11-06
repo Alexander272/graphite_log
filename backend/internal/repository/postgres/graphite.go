@@ -51,7 +51,7 @@ func (r *GraphiteRepo) getColumnName(field string) string {
 		"document":        "document",
 		"supplier":        "supplier",
 		"supplierName":    "supplier_name",
-		"issuanceForProd": "issuance_dates",
+		"issuanceForProd": "issuance_dates[array_length(issuance_dates, 1) - 1]",
 		"purpose":         "purpose",
 		"number1c":        "number_1c",
 		"act":             "act",
