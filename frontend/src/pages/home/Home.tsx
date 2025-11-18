@@ -16,8 +16,9 @@ export default function Home() {
 				width={'100%'}
 				border={'1px solid rgba(0, 0, 0, 0.12)'}
 				height={'fit-content'}
+				// height={'100%'}
 				minHeight={600}
-				maxHeight={800}
+				// maxHeight={800}
 				display={'flex'}
 				flexDirection={'column'}
 				sx={{ backgroundColor: '#fff', userSelect: 'none' }}

@@ -100,7 +100,7 @@ const Row = () => {
 	}
 
 	return (
-		<TableRow width={width} height={height} sx={{ padding: '0 6px' }}>
+		<TableRow width={width} height={height}>
 			{renderHeader()}
 		</TableRow>
 	)

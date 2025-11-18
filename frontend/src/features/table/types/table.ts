@@ -7,7 +7,7 @@
 // 	children?: IHeadColumn[]
 // }
 
-export type ColumnTypes = 'text' | 'number' | 'date' | 'file' | 'list' | 'autocomplete' | 'parent'
+export type ColumnTypes = 'text' | 'number' | 'date' | 'file' | 'list' | 'autocomplete' | 'parent' | 'date_list'
 
 export interface IColumn {
 	id: string
@@ -20,7 +20,7 @@ export interface IColumn {
 	allowSort?: boolean
 	// allowFilter?: boolean
 	hidden?: boolean
-	filter?: 'date' | 'text' | 'number' | 'list' | 'autocomplete'
+	filter?: 'date' | 'text' | 'number' | 'list' | 'autocomplete' | 'date_list'
 	allowSearch?: boolean
 	children?: IColumn[]
 }

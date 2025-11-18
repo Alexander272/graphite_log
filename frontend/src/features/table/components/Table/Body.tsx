@@ -1,4 +1,4 @@
-import { type FC } from 'react'
+import { useEffect, useState, type FC } from 'react'
 import { FixedSizeList } from 'react-window'
 
 import { MaxSize, RowHeight, Size } from '../../constants/defaultValues'
@@ -17,9 +17,17 @@ export const Body: FC<Props> = () => {
 	const size = useAppSelector(getTableSize)
 	const columns = useAppSelector(getColumns)
 
+	const [maxSize, setMaxSize] = useState(MaxSize)
+
 	const { data, isFetching, isLoading } = useGetTableItems()
 
 	const { width } = useCalcWidth(columns || [])
+
+	useEffect(() => {
+		if (!isFetching && window.innerHeight > 1000) {
+			setMaxSize(Math.floor((window.innerHeight - 250) / RowHeight) - 1 || MaxSize)
+		}
+	}, [isFetching, size])
 
 	if (!isLoading && !data?.total) return <NoRowsOverlay />
 	return (
@@ -29,7 +37,7 @@ export const Body: FC<Props> = () => {
 			{data && (
 				<FixedSizeList
 					overscanCount={10}
-					height={RowHeight * (size > Size ? MaxSize : Size)}
+					height={RowHeight * (size > Size ? maxSize : Size)}
 					itemCount={data.data.length > (size || Size) ? size || Size : data.data.length}
 					itemSize={RowHeight}
 					width={width}

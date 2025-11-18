@@ -10,11 +10,13 @@ import { TextFilter } from './Text'
 import { NumberFilter } from './Number'
 import { DateFilter } from './Date'
 import { AutocompleteFilter } from './Autocomplete'
+import { DateListFilter } from './DateList'
 // import { ListFilter } from './List'
 
 const compareTypes = new Map([
 	['string', 'con'],
 	['date', 'eq'],
+	['date_list', 'l_eq'],
 	['number', 'eq'],
 	['switch', 'eq'],
 	['list', 'in'],
@@ -83,6 +85,7 @@ export const FilterItem: FC<Props> = ({ index, onRemove }) => {
 			{type == 'text' && <TextFilter index={index} />}
 			{type == 'number' && <NumberFilter index={index} />}
 			{type == 'date' && <DateFilter index={index} />}
+			{type == 'date_list' && <DateListFilter index={index} />}
 			{type == 'autocomplete' && <AutocompleteFilter index={index} />}
 			{/* {type == 'list' && <ListFilter index={index} />} */}
 

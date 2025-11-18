@@ -46,7 +46,7 @@ export const Row: FC<Props> = ({ item, sx }) => {
 			hover
 			sx={{
 				...sx,
-				padding: '0 6px',
+				// padding: '0 6px',
 				// width: 'fit-content',
 				backgroundColor: background,
 			}}

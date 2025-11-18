@@ -51,7 +51,8 @@ type CellProps = {
 	isActive?: boolean
 }
 export const TableCellContainer = styled.div<CellProps>`
-	width: ${props => (props.width ? props.width + 'px' : '100%')};
+	min-width: ${props => (props.width ? props.width + 'px' : '100%')};
+	max-width: ${props => (props.width ? props.width + 'px' : '100%')};
 	position: relative;
 	border-bottom: 1px solid #e0e0e0;
 	cursor: ${props => props.isActive && 'pointer'};
