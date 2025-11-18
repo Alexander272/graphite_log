@@ -51,7 +51,7 @@ func (r *GraphiteRepo) getColumnName(field string) string {
 		"document":        "document",
 		"supplier":        "supplier",
 		"supplierName":    "supplier_name",
-		"issuanceForProd": "issuance_dates[array_length(issuance_dates, 1) - 1]",
+		"issuanceForProd": "issuance_dates",
 		"purpose":         "purpose",
 		"number1c":        "number_1c",
 		"act":             "act",
@@ -128,6 +128,7 @@ func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*
 		GraphiteTable, ExtendingTable, IssuanceTable, UserTable,
 		filter, search, order, count, count+1,
 	)
+	// logger.Debug("get graphite", logger.StringAttr("query", query))
 
 	tmp := []*pq_models.Graphite{}
 	if err := r.db.SelectContext(ctx, &tmp, query, params...); err != nil {

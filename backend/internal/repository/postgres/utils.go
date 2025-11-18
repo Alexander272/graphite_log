@@ -34,6 +34,13 @@ func getFilterLine(compare string, fieldName string, count int) string {
 	case "lte":
 		return fmt.Sprintf("%s <= $%d", fieldName, count)
 
+	case "l_eq":
+		return fmt.Sprintf("$%d = ANY(%s)", count, fieldName)
+	case "l_gte":
+		return fmt.Sprintf("EXISTS (SELECT 1 FROM unnest(%s) AS arr_elem WHERE arr_elem >= $%d)", fieldName, count)
+	case "l_lte":
+		return fmt.Sprintf("EXISTS (SELECT 1 FROM unnest(%s) AS arr_elem WHERE arr_elem <= $%d)", fieldName, count)
+
 	case "null":
 		return fmt.Sprintf("(%s IS NULL OR %s::text = '')", fieldName, fieldName)
 	}
