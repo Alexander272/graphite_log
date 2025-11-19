@@ -76,7 +76,7 @@ func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForPro
 		return fmt.Errorf("failed to create issuances. error: %w", err)
 	}
 
-	if dto.IsFull {
+	if dto.IsFull || dto.Type == "return" {
 		if err := s.graphite.SetIssued(ctx, &models.SetGraphiteIssuedDTO{Id: dto.GraphiteId, Place: dto.Place}); err != nil {
 			return err
 		}

@@ -20,14 +20,13 @@ import (
 	"github.com/Alexander272/graphite_log/backend/pkg/database/postgres"
 	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 	"github.com/Alexander272/graphite_log/backend/pkg/mattermost"
-	"github.com/subosito/gotenv"
 )
 
 func main() {
 	//* Init config
-	if err := gotenv.Load("../.env"); err != nil {
-		log.Fatalf("error loading env variables: %s", err.Error())
-	}
+	// if err := gotenv.Load("../.env"); err != nil {
+	// 	log.Fatalf("error loading env variables: %s", err.Error())
+	// }
 
 	conf, err := config.Init("configs/config.yaml")
 	if err != nil {

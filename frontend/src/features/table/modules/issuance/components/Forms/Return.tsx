@@ -8,7 +8,7 @@ import type { IFetchError } from '@/app/types/error'
 import type { IReturnDTO } from '../../types/issuance'
 import { useAppDispatch } from '@/hooks/redux'
 import { useGetTableItemByIdQuery } from '@/features/table/tableApiSlice'
-import { useCreateIssuanceMutation, useGetLastIssuanceQuery } from '../../issuanceApiSlice'
+import { useCreateReturnMutation, useGetLastIssuanceQuery } from '../../issuanceApiSlice'
 import { changeDialogIsOpen } from '@/features/dialog/dialogSlice'
 import { BoxFallback } from '@/components/Fallback/BoxFallback'
 import { Inputs } from './ReturnInputs'
@@ -30,7 +30,7 @@ const defaultValues: IReturnDTO = {
 export const Return: FC<Props> = ({ id }) => {
 	const dispatch = useAppDispatch()
 
-	const [create, { isLoading }] = useCreateIssuanceMutation()
+	const [create, { isLoading }] = useCreateReturnMutation()
 	const { data, isFetching } = useGetTableItemByIdQuery(id, { skip: !id })
 	const { data: last, isFetching: isFetchingLast } = useGetLastIssuanceQuery(id, { skip: !id })
 
@@ -56,7 +56,7 @@ export const Return: FC<Props> = ({ id }) => {
 		}
 	})
 
-	if (last?.data.type == 'return')
+	if (last?.data.type == 'return' && last.data.isFull)
 		return (
 			<Typography textAlign={'center'}>
 				Возврат уже был сделан в {dayjs(last.data.issuanceDate).format('DD.MM.YYYY')}

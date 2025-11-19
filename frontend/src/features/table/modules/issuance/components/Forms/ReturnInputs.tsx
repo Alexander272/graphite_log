@@ -30,7 +30,7 @@ export const Inputs = () => {
 			<Controller
 				name={'place'}
 				control={control}
-				rules={{ required: true }}
+				rules={{ required: true, validate: (value: string) => value.trim() !== '' }}
 				render={({ field: { onChange, value, ref }, fieldState: { error } }) => (
 					<Autocomplete
 						value={value || ''}

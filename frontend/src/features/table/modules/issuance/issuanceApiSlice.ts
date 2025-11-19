@@ -44,9 +44,18 @@ const issuanceApiSlice = apiSlice.injectEndpoints({
 			},
 		}),
 
-		createIssuance: builder.mutation<null, IIssuanceDTO | IReturnDTO>({
+		createIssuance: builder.mutation<null, IIssuanceDTO>({
 			query: data => ({
 				url: API.issuance,
+				method: 'POST',
+				body: data,
+			}),
+			invalidatesTags: [{ type: 'Table', id: 'ALL' }],
+		}),
+
+		createReturn: builder.mutation<null, IReturnDTO>({
+			query: data => ({
+				url: `${API.issuance}/return`,
 				method: 'POST',
 				body: data,
 			}),
@@ -77,6 +86,7 @@ export const {
 	useGetIssuanceQuery,
 	useGetLastIssuanceQuery,
 	useCreateIssuanceMutation,
+	useCreateReturnMutation,
 	useUpdateIssuanceMutation,
 	useDeleteIssuanceMutation,
 } = issuanceApiSlice

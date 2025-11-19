@@ -3,6 +3,7 @@ package issuance
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/Alexander272/graphite_log/backend/internal/constants"
 	"github.com/Alexander272/graphite_log/backend/internal/models"
@@ -36,6 +37,7 @@ func Register(api *gin.RouterGroup, service services.IssuanceForProd, middleware
 		write := issuance.Group("", middleware.CheckPermissions(constants.Issuance, constants.Write))
 		{
 			write.POST("", handler.create)
+			write.POST("/return", handler.retrieval)
 			write.PUT("/:id", handler.update)
 			write.DELETE("/:id", handler.delete)
 		}
@@ -90,6 +92,41 @@ func (h *Handler) create(c *gin.Context) {
 		return
 	}
 	dto.UserId = user.Id
+
+	if err := h.service.Create(c, dto); err != nil {
+		if errors.Is(err, models.ErrWasIssued) {
+			response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Весь графит уже выдан в производство")
+			return
+		}
+
+		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		error_bot.Send(c, err.Error(), dto)
+		return
+	}
+	logger.Info("Выдача в производство добавлена", logger.AnyAttr("dto", dto))
+
+	c.JSON(http.StatusCreated, response.IdResponse{Message: "Выдача в производство добавлена"})
+}
+
+func (h *Handler) retrieval(c *gin.Context) {
+	u, exists := c.Get(constants.CtxUser)
+	if !exists {
+		response.NewErrorResponse(c, http.StatusUnauthorized, "empty user", "Сессия не найдена")
+		return
+	}
+	user := u.(models.User)
+
+	dto := &models.IssuanceForProdDTO{}
+	if err := c.BindJSON(dto); err != nil {
+		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
+		return
+	}
+	dto.UserId = user.Id
+
+	if strings.TrimSpace(dto.Place) == "" {
+		response.NewErrorResponse(c, http.StatusBadRequest, "empty param", "Отправлены некорректные данные")
+		return
+	}
 
 	if err := h.service.Create(c, dto); err != nil {
 		if errors.Is(err, models.ErrWasIssued) {
