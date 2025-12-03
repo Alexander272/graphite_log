@@ -14,6 +14,9 @@ export type DialogVariants =
 	| 'Access'
 	| 'History'
 	| 'Changes'
+	| 'Notification'
+	| 'AddChannel'
+	| 'Channels'
 
 interface IDialogOptions {
 	isOpen: boolean

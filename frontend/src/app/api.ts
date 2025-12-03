@@ -30,4 +30,6 @@ export const API = {
 	accesses: '/accesses' as const,
 	import: '/import' as const,
 	changes: '/changes' as const,
+	notifications: '/notifications' as const,
+	channels: '/channels' as const,
 }

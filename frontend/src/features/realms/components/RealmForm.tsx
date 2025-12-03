@@ -27,6 +27,7 @@ const defaultValues: Form = {
 	name: '',
 	realm: '',
 	isActive: true,
+	expiresIn: 24,
 }
 
 export const RealmForm: FC<Props> = ({ realm, setRealm }) => {
@@ -54,7 +55,7 @@ export const RealmForm: FC<Props> = ({ realm, setRealm }) => {
 		console.log('save', form, dirtyFields)
 		if (!Object.keys(dirtyFields).length) return
 
-		const newData = { ...form, id: data?.data.id || '' }
+		const newData = { ...form, id: data?.data.id || '', name: form.name.trim(), expiresIn: +form.expiresIn }
 		try {
 			if (realm == 'new') {
 				const payload = await create(newData).unwrap()
@@ -99,6 +100,15 @@ export const RealmForm: FC<Props> = ({ realm, setRealm }) => {
 					control={control}
 					name={'realm'}
 					render={({ field }) => <TextField {...field} label={'Короткое название (код, url)'} fullWidth />}
+				/>
+			</Stack>
+			<Stack direction={'row'} flexGrow={1} spacing={2} mb={2}>
+				<Controller
+					control={control}
+					name={'expiresIn'}
+					render={({ field }) => (
+						<TextField {...field} label={'Срок годности графита в месяцах'} fullWidth type={'number'} />
+					)}
 				/>
 			</Stack>
 
