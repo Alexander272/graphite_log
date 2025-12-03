@@ -33,6 +33,10 @@ func NewNotificationService(deps *NotificationDeps) *NotificationService {
 
 type Notification interface {
 	SendOverdue() error
+	GetByRealm(ctx context.Context, req *models.GetNotificationByRealmDTO) ([]*models.Notification, error)
+	Create(ctx context.Context, dto *models.NotificationDTO) error
+	Update(ctx context.Context, dto *models.NotificationDTO) error
+	Delete(ctx context.Context, dto *models.DeleteNotificationDTO) error
 }
 
 func (s *NotificationService) SendOverdue() error {
@@ -59,6 +63,10 @@ func (s *NotificationService) SendOverdue() error {
 		dataByRealm[g.RealmId] = append(dataByRealm[g.RealmId], g)
 	}
 
+	if len(dataByRealm) == 0 {
+		return nil
+	}
+
 	title := "У графита истекает срок годности"
 	tableHead := "| Наименование в 1С | Регистрационный № | Дата производства | Дата истечения срока годности |"
 	tableAlign := "|:--|:--|:--|:--|"
@@ -72,7 +80,7 @@ func (s *NotificationService) SendOverdue() error {
 		table := []string{tableHead, tableAlign}
 
 		for _, g := range dataByRealm[u.RealmId] {
-			expiryDate := g.ProductionDate.AddDate(2, 0, 0)
+			expiryDate := g.ProductionDate.AddDate(0, g.ExpiresIn, 0)
 			if g.DateOfExtending.Year() > 2000 {
 				expiryDate = g.DateOfExtending.AddDate(0, g.PeriodOfExtending, 0)
 			}
@@ -99,5 +107,34 @@ func (s *NotificationService) SendOverdue() error {
 		return err
 	}
 
+	return nil
+}
+
+func (s *NotificationService) GetByRealm(ctx context.Context, req *models.GetNotificationByRealmDTO) ([]*models.Notification, error) {
+	data, err := s.repo.GetByRealm(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get notifications by realm. error: %w", err)
+	}
+	return data, nil
+}
+
+func (s *NotificationService) Create(ctx context.Context, dto *models.NotificationDTO) error {
+	if err := s.repo.Create(ctx, dto); err != nil {
+		return fmt.Errorf("failed to create notification. error: %w", err)
+	}
+	return nil
+}
+
+func (s *NotificationService) Update(ctx context.Context, dto *models.NotificationDTO) error {
+	if err := s.repo.Update(ctx, dto); err != nil {
+		return fmt.Errorf("failed to update notification. error: %w", err)
+	}
+	return nil
+}
+
+func (s *NotificationService) Delete(ctx context.Context, dto *models.DeleteNotificationDTO) error {
+	if err := s.repo.Delete(ctx, dto); err != nil {
+		return fmt.Errorf("failed to delete notification. error: %w", err)
+	}
 	return nil
 }

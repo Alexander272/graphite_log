@@ -34,7 +34,7 @@ func (r *RealmRepo) Get(ctx context.Context, req *models.GetRealmsDTO) ([]*model
 		condition = ""
 	}
 
-	query := fmt.Sprintf(`SELECT id, name, realm, is_active, created_at	FROM %s %s ORDER BY created_at`,
+	query := fmt.Sprintf(`SELECT id, name, realm, is_active, expires_in, created_at	FROM %s %s ORDER BY created_at`,
 		RealmTable, condition,
 	)
 	data := []*models.Realm{}
@@ -60,7 +60,7 @@ func (r *RealmRepo) GetByUser(ctx context.Context, req *models.GetRealmByUserDTO
 }
 
 func (r *RealmRepo) GetById(ctx context.Context, req *models.GetRealmByIdDTO) (*models.Realm, error) {
-	query := fmt.Sprintf(`SELECT id, name, realm, is_active, created_at FROM %s WHERE id=$1`,
+	query := fmt.Sprintf(`SELECT id, name, realm, is_active, expires_in, created_at FROM %s WHERE id=$1`,
 		RealmTable,
 	)
 	data := &models.Realm{}
@@ -75,8 +75,8 @@ func (r *RealmRepo) GetById(ctx context.Context, req *models.GetRealmByIdDTO) (*
 }
 
 func (r *RealmRepo) Create(ctx context.Context, dto *models.RealmDTO) error {
-	query := fmt.Sprintf(`INSERT INTO %s (id, name, realm, is_active)
-		VALUES (:id, :name, :realm, :is_active)`,
+	query := fmt.Sprintf(`INSERT INTO %s (id, name, realm, is_active, expires_in)
+		VALUES (:id, :name, :realm, :is_active, :expires_in)`,
 		RealmTable,
 	)
 	dto.Id = uuid.NewString()
@@ -88,7 +88,7 @@ func (r *RealmRepo) Create(ctx context.Context, dto *models.RealmDTO) error {
 }
 
 func (r *RealmRepo) Update(ctx context.Context, dto *models.RealmDTO) error {
-	query := fmt.Sprintf(`UPDATE %s SET name=:name, is_active=:is_active WHERE id=:id`,
+	query := fmt.Sprintf(`UPDATE %s SET name=:name, is_active=:is_active, expires_in=:expires_in WHERE id=:id`,
 		RealmTable,
 	)
 

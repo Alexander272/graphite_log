@@ -3,11 +3,12 @@ package models
 import "time"
 
 type Realm struct {
-	Id       string    `json:"id" db:"id"`
-	Name     string    `json:"name" db:"name"`
-	Realm    string    `json:"realm" db:"realm"`
-	IsActive bool      `json:"isActive" db:"is_active"`
-	Created  time.Time `json:"created" db:"created_at"`
+	Id        string    `json:"id" db:"id"`
+	Name      string    `json:"name" db:"name"`
+	Realm     string    `json:"realm" db:"realm"`
+	IsActive  bool      `json:"isActive" db:"is_active"`
+	ExpiresIn int       `json:"expiresIn" db:"expires_in"`
+	Created   time.Time `json:"created" db:"created_at"`
 }
 
 type GetRealmsDTO struct {
@@ -29,10 +30,11 @@ type ChooseRealmDTO struct {
 }
 
 type RealmDTO struct {
-	Id       string `json:"id" db:"id"`
-	Name     string `json:"name" db:"name" binding:"required"`
-	Realm    string `json:"realm" db:"realm" binding:"required"`
-	IsActive bool   `json:"isActive" db:"is_active"`
+	Id        string `json:"id" db:"id"`
+	Name      string `json:"name" db:"name" binding:"required"`
+	Realm     string `json:"realm" db:"realm" binding:"required"`
+	IsActive  bool   `json:"isActive" db:"is_active"`
+	ExpiresIn int    `json:"expiresIn" db:"expires_in" binding:"required"`
 }
 
 type DeleteRealmDTO struct {

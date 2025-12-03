@@ -39,7 +39,7 @@ func (r *NotificationRepo) Get(ctx context.Context, req *models.GetNotificationD
 }
 
 func (r *NotificationRepo) GetByRealm(ctx context.Context, dto *models.GetNotificationByRealmDTO) ([]*models.Notification, error) {
-	query := fmt.Sprintf(`SELECT id, notification_type, most_id, channel_id FROM %s WHERE realm_id=$1`,
+	query := fmt.Sprintf(`SELECT id, notification_type, most_id, channel_id FROM %s WHERE realm_id=$1 ORDER BY notification_type, most_id`,
 		NotificationTable,
 	)
 	data := []*models.Notification{}

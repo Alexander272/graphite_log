@@ -195,14 +195,16 @@ func (r *GraphiteRepo) GetUniqueData(ctx context.Context, req *models.GetUniqueD
 func (r *GraphiteRepo) GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error) {
 	query := fmt.Sprintf(`SELECT id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, document, 
 		supplier, supplier_name, is_all_issued, purpose, number_1c, act, production_date, place, notes, 
-		COALESCE(date_of_extending, '1900-01-01'::DATE) AS date_of_extending, COALESCE(period_of_extending, 0) AS period_of_extending
+		COALESCE(date_of_extending, '1900-01-01'::DATE) AS date_of_extending, COALESCE(period_of_extending, 0) AS period_of_extending,
+		COALESCE(NULLIF(g.expires_in,0), r.expires_in) AS expires_in
 		FROM %s AS g
+		LEFT JOIN LATERAL (SELECT expires_in FROM %s WHERE id=g.realm_id) AS r ON TRUE
 		LEFT JOIN LATERAL (SELECT date_of_extending, period_of_extending FROM %s WHERE graphite_id=g.id ORDER BY date_of_extending DESC LIMIT 1) AS e ON TRUE 
-		WHERE production_date + INTERVAL '24 months' - INTERVAL '14 days' <= $1
+		WHERE production_date + COALESCE(NULLIF(g.expires_in,0), r.expires_in) * INTERVAL '1 month' - INTERVAL '14 days' <= $1
 		AND CASE WHEN date_of_extending IS NOT NULL THEN date_of_extending + (period_of_extending * INTERVAL '1 month') - INTERVAL '14 days'<=$1 ELSE TRUE END 
 		AND is_all_issued IS FALSE AND is_overdue IS FALSE
 		ORDER BY realm_id`,
-		GraphiteTable, ExtendingTable,
+		GraphiteTable, RealmTable, ExtendingTable,
 	)
 	data := []*models.Graphite{}
 
@@ -214,9 +216,9 @@ func (r *GraphiteRepo) GetOverdue(ctx context.Context, req *models.GetOverdueDTO
 
 func (r *GraphiteRepo) Create(ctx context.Context, dto *models.GraphiteDTO) error {
 	query := fmt.Sprintf(`INSERT INTO %s (id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, number_1c, act, production_date, place, notes)
+		document, supplier, supplier_name, number_1c, act, production_date, expires_in, place, notes)
 		VALUES (:id, :realm_id, :date_of_receipt, :name, :erp_name, :supplier_batch, :big_bag_number, :registration_number, 
-		:document, :supplier, :supplier_name, :number_1c, :act, :production_date, :place, :notes)`,
+		:document, :supplier, :supplier_name, :number_1c, :act, :production_date, :expires_in, :place, :notes)`,
 		GraphiteTable,
 	)
 	dto.Id = uuid.NewString()
@@ -247,7 +249,7 @@ func (r *GraphiteRepo) CreateSeveral(ctx context.Context, dto []*models.Graphite
 func (r *GraphiteRepo) Update(ctx context.Context, dto *models.GraphiteDTO) error {
 	query := fmt.Sprintf(`UPDATE %s SET date_of_receipt=:date_of_receipt, name=:name, erp_name=:erp_name, supplier_batch=:supplier_batch, 
 		big_bag_number=:big_bag_number, registration_number=:registration_number, document=:document, supplier=:supplier, supplier_name=:supplier_name, 
-		number_1c=:number_1c, act=:act, production_date=:production_date, notes=:notes WHERE id=:id`,
+		number_1c=:number_1c, act=:act, production_date=:production_date, expires_in=:expires_in, notes=:notes WHERE id=:id`,
 		GraphiteTable,
 	)
 

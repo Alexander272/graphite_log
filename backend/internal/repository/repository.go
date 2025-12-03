@@ -40,6 +40,9 @@ type Notification interface {
 type Changes interface {
 	postgres.Changes
 }
+type Channels interface {
+	postgres.Channels
+}
 
 type Repository struct {
 	Rule
@@ -55,6 +58,7 @@ type Repository struct {
 
 	Notification
 	Changes
+	Channels
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
@@ -72,5 +76,6 @@ func NewRepository(db *sqlx.DB) *Repository {
 
 		Notification: postgres.NewNotificationRepo(db),
 		Changes:      postgres.NewChangesRepo(db),
+		Channels:     postgres.NewChannelRepo(db),
 	}
 }

@@ -38,6 +38,7 @@ type Graphite struct {
 	IsOverdue         bool      `json:"isOverdue" db:"is_overdue"`
 	Place             string    `json:"place" db:"place"`
 	Notes             string    `json:"notes" db:"notes"`
+	ExpiresIn         int       `json:"expiresIn" db:"expires_in"`
 	Total             int       `json:"-" db:"total"`
 	// DateOfExtending int    `json:"extendingDate" db:"date_of_extending"`
 }
@@ -60,6 +61,7 @@ type GraphiteDTO struct {
 	Purpose        string    `json:"purpose" db:"purpose"`
 	Act            string    `json:"act" db:"act"`
 	ProductionDate time.Time `json:"productionDate" db:"production_date" binding:"required"`
+	ExpiresIn      int       `json:"expiresIn" db:"expires_in"`
 	Place          string    `json:"place" db:"place"`
 	Notes          string    `json:"notes" db:"notes"`
 	IsAllIssued    bool      `json:"isAllIssued" db:"is_all_issued"`

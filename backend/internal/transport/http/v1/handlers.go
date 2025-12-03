@@ -7,10 +7,12 @@ import (
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/accesses"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/auth"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/changes"
+	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/channels"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/extending"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/graphite"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/import_file"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/issuance"
+	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/notifications"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/realm"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/roles"
 	"github.com/Alexander272/graphite_log/backend/internal/transport/http/v1/user"
@@ -52,4 +54,6 @@ func (h *Handler) Init(group *gin.RouterGroup) {
 	issuance.Register(secure, h.services.IssuanceForProd, h.middleware)
 	import_file.Register(secure, h.services.Import, h.middleware)
 	changes.Register(secure, h.services.Changes, h.middleware)
+	channels.Register(secure, h.services.Channels, h.middleware)
+	notifications.Register(secure, h.services.Notification, h.middleware)
 }
