@@ -109,7 +109,7 @@ func (s *UserService) GetInfo(ctx context.Context, req *models.GetUserInfoDTO) (
 func (s *UserService) Sync(ctx context.Context) error {
 	logger.Info("Sync users")
 
-	token, err := s.keycloak.Login(ctx)
+	token, err := s.keycloak.GetToken(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to login to keycloak. error: %w", err)
 	}

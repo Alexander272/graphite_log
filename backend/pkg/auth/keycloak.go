@@ -55,7 +55,7 @@ func NewKeycloakClient(deps Deps) *KeycloakClient {
 	}
 }
 
-func (k *KeycloakClient) Login(ctx context.Context) (*gocloak.JWT, error) {
+func (k *KeycloakClient) GetToken(ctx context.Context) (*gocloak.JWT, error) {
 	token, err := k.Client.LoginAdmin(ctx, k.adminName, k.adminPass, "master")
 	if err != nil {
 		// log.Fatalf("failed to login admin to keycloak. error: %s", err.Error())

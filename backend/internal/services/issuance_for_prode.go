@@ -68,8 +68,9 @@ func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForPro
 		return err
 	}
 
-	if cnd != nil && cnd.IsFull && dto.Type != "return" {
-		return models.ErrWasIssued
+	// Проверяем возможность выполнения операции
+	if err := s.validateIssuance(cnd, dto); err != nil {
+		return err
 	}
 
 	if err := s.repo.Create(ctx, dto); err != nil {
@@ -80,6 +81,25 @@ func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForPro
 		if err := s.graphite.SetIssued(ctx, &models.SetGraphiteIssuedDTO{Id: dto.GraphiteId, Place: dto.Place}); err != nil {
 			return err
 		}
+	}
+	return nil
+}
+
+// Вспомогательная функция для проверки логики выдачи
+func (s *IssuanceService) validateIssuance(current *models.IssuanceForProd, newDto *models.IssuanceForProdDTO) error {
+	// Если нет предыдущих операций - разрешаем
+	if current == nil {
+		return nil
+	}
+
+	// Если последняя операция - возврат, разрешаем любые новые операции
+	if current.Type == "return" {
+		return nil
+	}
+
+	// Если предыдущая была полной выдачей и новая - не возврат - запрещаем
+	if current.IsFull && newDto.Type != "return" {
+		return models.ErrWasIssued
 	}
 	return nil
 }
