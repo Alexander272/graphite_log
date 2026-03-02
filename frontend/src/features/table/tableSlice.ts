@@ -1,8 +1,9 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { createSelector, createSlice, type PayloadAction } from '@reduxjs/toolkit'
 
 import type { RootState } from '@/app/store'
 import type { IFilter, ISearch, ISort } from './types/params'
 import type { IColumn, IContextMenu } from './types/table'
+import type { ITableItem } from './types/item'
 import { Size } from './constants/defaultValues'
 import { localKeys } from './constants/storage'
 import { Columns } from './constants/columns'
@@ -14,7 +15,8 @@ interface ITableSlice {
 	sort: ISort
 	filters: IFilter[]
 	search: ISearch
-	// selected: ISelect
+	selectedIds: Record<string | number, boolean>
+	allSelected: boolean
 	contextMenu?: IContextMenu
 	columns: IColumn[]
 }
@@ -30,7 +32,8 @@ const initialState: ITableSlice = {
 		value: '',
 		fields: JSON.parse(localStorage.getItem(localKeys.search) || 'null') || defaultSearchFields,
 	},
-	// selected: {},
+	selectedIds: {},
+	allSelected: false,
 	columns: JSON.parse(localStorage.getItem(localKeys.columns) || 'null') || Columns,
 }
 
@@ -88,6 +91,31 @@ const tableSlice = createSlice({
 		// 		}
 		// 	} else state.selected = {}
 		// },
+		toggleSelect: (state, action: PayloadAction<string | number>) => {
+			const id = action.payload
+			if (state.selectedIds[id]) {
+				delete state.selectedIds[id]
+				state.allSelected = false
+			} else {
+				state.selectedIds[id] = true
+			}
+		},
+		selectAll: (state, action: PayloadAction<ITableItem[]>) => {
+			if (state.allSelected || !action.payload.length) {
+				state.selectedIds = {}
+				state.allSelected = false
+			} else {
+				// Создаем карту за один проход
+				state.selectedIds = action.payload.reduce(
+					(acc, item) => {
+						acc[item.id] = true
+						return acc
+					},
+					{} as Record<string, boolean>,
+				)
+				state.allSelected = true
+			}
+		},
 
 		setContextMenu: (state, action: PayloadAction<IContextMenu | undefined>) => {
 			state.contextMenu = action.payload
@@ -116,9 +144,32 @@ export const getTableSize = (state: RootState) => state.table.size
 export const getSort = (state: RootState) => state.table.sort
 export const getFilters = (state: RootState) => state.table.filters
 export const getSearch = (state: RootState) => state.table.search
-// export const getSelected = (state: RootState) => state.table.selected
+export const getSelected = (state: RootState) => state.table.selectedIds
 export const getContextMenu = (state: RootState) => state.table.contextMenu
 export const getColumns = (state: RootState) => state.table.columns
+
+export const getVisibleFlatColumns = createSelector([getColumns], columns => {
+	const flat: IColumn[] = []
+	columns.forEach(c => {
+		if (c?.hidden) return
+		if (c.children) {
+			c.children.forEach(child => {
+				if (!child?.hidden) flat.push(child)
+			})
+		} else {
+			flat.push(c)
+		}
+	})
+
+	const checkboxColumn = {
+		id: 'selection-col',
+		field: 'selection',
+		width: 50,
+		type: 'checkbox',
+	} as unknown as IColumn
+	return [checkboxColumn, ...flat]
+	return flat
+})
 
 export const tablePath = tableSlice.name
 export const tableReducer = tableSlice.reducer
@@ -130,6 +181,8 @@ export const {
 	setFilters,
 	setSearch,
 	setSearchFields,
+	toggleSelect,
+	selectAll,
 	// setSelected,
 	setContextMenu,
 	setColumns,

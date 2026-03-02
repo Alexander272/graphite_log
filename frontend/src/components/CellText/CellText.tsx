@@ -1,5 +1,5 @@
 import { Tooltip, Typography } from '@mui/material'
-import { type FC, useEffect, useRef, useState } from 'react'
+import { type FC, memo, useRef, useState } from 'react'
 
 type Props = {
 	value: string
@@ -7,38 +7,46 @@ type Props = {
 	align?: 'right' | 'left' | 'center' | 'inherit' | 'justify'
 }
 
-export const CellText: FC<Props> = ({ value, align = 'center', color }) => {
-	const [isOverflow, setIsOverflow] = useState<boolean>(false)
-	const overflowingText = useRef<HTMLParagraphElement | null>(null)
+export const CellText: FC<Props> = memo(({ value, align = 'center', color }) => {
+	const [isOverflow, setIsOverflow] = useState(false)
+	const textRef = useRef<HTMLParagraphElement>(null)
 
-	const checkOverflow = (el: HTMLParagraphElement | null): boolean => {
-		if (el) return el.offsetHeight < el.scrollHeight || el.offsetWidth < el.scrollWidth
-		return false
+	// Проверяем переполнение только ПРИ НАВЕДЕНИИ
+	const handleMouseEnter = () => {
+		const el = textRef.current
+		if (el) {
+			const hasOverflow = el.offsetWidth < el.scrollWidth
+			if (hasOverflow !== isOverflow) {
+				setIsOverflow(hasOverflow)
+			}
+		}
 	}
-
-	useEffect(() => {
-		setIsOverflow(checkOverflow(overflowingText.current))
-	}, [])
 
 	const text = (
 		<Typography
-			ref={overflowingText}
+			ref={textRef}
 			align={align}
-			// width={'100%'}
-			padding={'6px 6px'}
-			mr={0.5}
+			onMouseEnter={handleMouseEnter} // Замеряем только когда надо
 			sx={{
 				fontSize: '0.85rem',
 				overflow: 'hidden',
 				textOverflow: 'ellipsis',
 				whiteSpace: 'nowrap',
 				color: color,
+				padding: '6px 6px',
+				display: 'block', // Важно для корректного замера ширины
 			}}
 		>
 			{value}
 		</Typography>
 	)
 
-	if (isOverflow) return <Tooltip title={value}>{text}</Tooltip>
-	return text
-}
+	// Если переполнение обнаружено, оборачиваем в Tooltip
+	return isOverflow ? (
+		<Tooltip title={value} disableInteractive>
+			{text}
+		</Tooltip>
+	) : (
+		text
+	)
+})

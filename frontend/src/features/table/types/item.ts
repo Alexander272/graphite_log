@@ -52,7 +52,7 @@ export interface ITableItemDTO {
 }
 
 export interface ISetPurposeDTO {
-	id: string
+	ids: string[]
 	purpose: string
 }
 

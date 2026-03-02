@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import { useMemo, type FC } from 'react'
 import { TableContainer, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 
@@ -15,7 +15,38 @@ type Props = {
 	data: IChange[]
 }
 
+const formatIssuance = (item: IIssuance | null) => {
+	if (!item) return ''
+	const action = item.type === 'issuance' ? 'Выдан' : 'Возвращен'
+	const amount = item.amount ? `о ${item.amount} кг` : ''
+	const date = dayjs(item.issuanceDate).format('DD.MM.YYYY')
+	return `${action}${amount} ${date}`
+}
+
 export const Issuance: FC<Props> = ({ data }) => {
+	const preparedData = useMemo(() => {
+		return data.map(item => {
+			let original: IIssuance | null = null
+			let changed: IIssuance | string | null = null
+
+			try {
+				original = JSON.parse(item.original)
+				if (typeof item.changed === 'string' && !item.changed.startsWith('{')) changed = item.changed
+				else changed = JSON.parse(item.changed)
+			} catch (e) {
+				console.error('Failed to parse log item', e)
+			}
+
+			return {
+				id: item.id,
+				created: dayjs(item.created).format('DD.MM.YYYY HH:mm'),
+				userName: item.userName,
+				originalText: formatIssuance(original),
+				changed,
+			}
+		})
+	}, [data])
+
 	return (
 		<TableContainer sx={{ minHeight: 150, position: 'relative' }}>
 			{!data.length ? (
@@ -32,52 +63,26 @@ export const Issuance: FC<Props> = ({ data }) => {
 					</TableHead>
 
 					<TableBody>
-						{data.map(item => {
-							const original = JSON.parse(item.original) as IIssuance
-							const changed = JSON.parse(item.changed) as IIssuance
-
-							return (
-								<TableRow key={item.id} sx={{ minHeight: 38, cursor: 'default' }}>
-									<TableCell width={160}>{dayjs(item.created).format('DD.MM.YYYY HH:mm')}</TableCell>
-									<TableCell width={240}>
-										<Typography>
-											{[
-												original.type == 'issuance' ? 'Выдан' : 'Возвращен',
-												original.amount ? `о ${original.amount} кг` : '',
-												' ',
-												dayjs(original.issuanceDate).format('DD.MM.YYYY'),
-											].join('')}
+						{preparedData.map(row => (
+							<TableRow key={row.id} sx={{ minHeight: 38, cursor: 'default' }}>
+								<TableCell width={160}>{row.created}</TableCell>
+								<TableCell width={240}>
+									<Typography>{row.originalText}</Typography>
+								</TableCell>
+								<TableCell width={240}>
+									{typeof row.changed === 'string' ? (
+										<Typography variant='body2' fontWeight={700} color='error'>
+											(Удалено)
 										</Typography>
-									</TableCell>
-									<TableCell width={240}>
-										{typeof changed == 'string' ? (
-											<Typography fontWeight={700}>(Удалено)</Typography>
-										) : (
-											<Typography fontWeight={700}>
-												{[
-													changed.type == 'issuance' ? 'Выдан' : 'Возвращен',
-													changed.amount ? `о ${changed.amount} кг` : '',
-													' ',
-													dayjs(changed.issuanceDate).format('DD.MM.YYYY'),
-												].join('')}
-											</Typography>
-											// <Typography>
-											// 	<Typography component={'span'} fontWeight={700}>
-											// 		{[
-											// 			changed.type == 'issuance' ? 'Выдан' : 'Возвращен',
-											// 			changed.amount ? `о ${changed.amount} кг` : '',
-											// 		].join('')}
-											// 	</Typography>{' '}
-											// 	<Typography component={'span'} fontWeight={700}>
-											// 		{dayjs(changed.issuanceDate).format('DD.MM.YYYY')}
-											// 	</Typography>
-											// </Typography>
-										)}
-									</TableCell>
-									<TableCell width={210}>{item.userName}</TableCell>
-								</TableRow>
-							)
-						})}
+									) : (
+										<Typography variant='body2' fontWeight={700}>
+											{formatIssuance(row.changed as IIssuance)}
+										</Typography>
+									)}
+								</TableCell>
+								<TableCell width={210}>{row.userName}</TableCell>
+							</TableRow>
+						))}
 					</TableBody>
 				</Table>
 			)}

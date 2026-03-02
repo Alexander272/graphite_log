@@ -9,7 +9,7 @@ export const useCalcWidth = (data: readonly IColumn[]) => {
 			return ac + cur.children.reduce((ac, cur) => ac + (cur.hidden ? 0 : cur.width || ColWidth), 0)
 		}
 		return ac + (cur.hidden ? 0 : cur.width || ColWidth)
-	}, 14)
+	}, 64)
 
 	return { width, hasFewRows }
 }

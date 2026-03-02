@@ -1,4 +1,4 @@
-import type { FC } from 'react'
+import { useMemo, type FC } from 'react'
 import { TableContainer, Typography } from '@mui/material'
 import dayjs from 'dayjs'
 
@@ -16,6 +16,29 @@ type Props = {
 }
 
 export const Extending: FC<Props> = ({ data }) => {
+	const preparedData = useMemo(() => {
+		return data.map(item => {
+			let original: IExtending | null = null
+			let changed: IExtending | string | null = null
+
+			try {
+				original = JSON.parse(item.original)
+				if (typeof item.changed === 'string' && !item.changed.startsWith('{')) changed = item.changed
+				else changed = JSON.parse(item.changed)
+			} catch (e) {
+				console.error('Failed to parse log item', e)
+			}
+
+			return {
+				id: item.id,
+				created: dayjs(item.created).format('DD.MM.YYYY HH:mm'),
+				userName: item.userName,
+				orig: original,
+				changed,
+			}
+		})
+	}, [data])
+
 	return (
 		<TableContainer sx={{ minHeight: 150, position: 'relative' }}>
 			{!data.length ? (
@@ -32,22 +55,22 @@ export const Extending: FC<Props> = ({ data }) => {
 					</TableHead>
 
 					<TableBody>
-						{data.map(item => {
-							const changed = JSON.parse(item.changed) as IExtending
-
-							return (
-								<TableRow key={item.id} sx={{ minHeight: 38, cursor: 'default' }}>
-									<TableCell width={160}>{dayjs(item.created).format('DD.MM.YYYY HH:mm')}</TableCell>
-									<TableCell width={240}>{JSON.parse(item.original)?.act}</TableCell>
-									<TableCell width={240}>
-										<Typography fontWeight={700}>
-											{typeof changed == 'string' ? '(Удалено)' : changed?.act}
-										</Typography>
-									</TableCell>
-									<TableCell width={210}>{item.userName}</TableCell>
-								</TableRow>
-							)
-						})}
+						{preparedData.map(item => (
+							<TableRow key={item.id} sx={{ minHeight: 38, cursor: 'default' }}>
+								<TableCell width={160}>{dayjs(item.created).format('DD.MM.YYYY HH:mm')}</TableCell>
+								<TableCell width={240}>
+									{item.orig?.act} на {item.orig?.period} мес.
+								</TableCell>
+								<TableCell width={240}>
+									<Typography fontWeight={700}>
+										{typeof item.changed == 'string'
+											? '(Удалено)'
+											: `${item.changed?.act} на ${item.changed?.period} мес.`}
+									</Typography>
+								</TableCell>
+								<TableCell width={210}>{item.userName}</TableCell>
+							</TableRow>
+						))}
 					</TableBody>
 				</Table>
 			)}

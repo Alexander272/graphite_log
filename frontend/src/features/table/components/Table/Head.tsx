@@ -1,4 +1,4 @@
-import { type FC, type JSX } from 'react'
+import { memo, useMemo, type FC, type JSX } from 'react'
 
 import type { IColumn } from '../../types/table'
 import { ColWidth, RowHeight } from '../../constants/defaultValues'
@@ -12,96 +12,102 @@ import { TableCell } from '@/components/Table/TableCell'
 import { CellText } from '@/components/CellText/CellText'
 import { Badge } from '@/components/Badge/Badge'
 import { SortUpIcon } from '@/components/Icons/SortUpIcon'
+import { HeaderCheckbox } from './HeaderCheckbox'
 
-type Props = unknown
-
-export const Head: FC<Props> = () => {
-	return (
-		<TableHead>
-			<Row />
-		</TableHead>
-	)
-}
-
-const Row = () => {
+export const Head: FC = memo(() => {
 	const sort = useAppSelector(getSort)
-	const columns = useAppSelector(getColumns)
-	// const hidden = useAppSelector(getHidden)
-
+	const columns = useAppSelector(getColumns) // Берем исходные колонки для групп
 	const { width, hasFewRows } = useCalcWidth(columns)
 	const height = (hasFewRows ? 2 : 1) * RowHeight
 
-	const dispatch = useAppDispatch()
+	const sortKeys = useMemo(() => Object.keys(sort), [sort])
 
-	const setSortHandler = (field: string) => () => {
-		dispatch(setSort(field))
-	}
-
-	const getCell = (c: IColumn) => {
-		return (
-			<TableCell
-				key={c.field}
-				width={c.width || ColWidth}
-				isActive
-				onClick={c.allowSort ? setSortHandler(c.field) : undefined}
-			>
-				<CellText value={c.name} />
-				{c.allowSort ? (
-					<Badge
-						color='primary'
-						badgeContent={Object.keys(sort).findIndex(k => k == c.field) + 1}
-						invisible={Object.keys(sort).length < 2}
-					>
-						<SortUpIcon
-							fontSize={16}
-							fill={sort[c.field] ? 'black' : '#adadad'}
-							transform={!sort[c.field] || sort[c.field] == 'ASC' ? '' : 'rotateX(180deg)'}
-							transition={'.2s all ease-in-out'}
-						/>
-					</Badge>
-				) : null}
-			</TableCell>
-		)
-	}
-	const renderHeader = () => {
+	const renderContent = useMemo(() => {
 		const header: JSX.Element[] = []
 
+		// Добавляем чекбокс "Выбрать все"
+		header.push(
+			<TableCell key='selection-head' width={50}>
+				<HeaderCheckbox />
+			</TableCell>,
+		)
+
 		columns.forEach(c => {
-			if (c.children && !c?.hidden) {
-				let width = 0
-				const subhead: JSX.Element[] = []
+			if (c.hidden) return
 
-				c.children.forEach(c => {
-					if (!c?.hidden) {
-						width += c.width || ColWidth
+			if (c.children) {
+				const visibleChildren = c.children.filter(child => !child.hidden)
+				if (visibleChildren.length === 0) return
 
-						subhead.push(getCell(c))
-					}
-				})
+				const groupWidth = visibleChildren.reduce((acc, child) => acc + (child.width || ColWidth), 0)
 
-				if (subhead.length > 0) {
-					header.push(
-						<TableGroup key={c.field}>
-							<TableRow>
-								<TableCell width={width} key={c.field}>
-									<CellText value={c.name} />
-								</TableCell>
-							</TableRow>
-							<TableRow>{subhead}</TableRow>
-						</TableGroup>
-					)
-				}
-			} else if (!c?.hidden) {
-				header.push(getCell(c))
+				header.push(
+					<TableGroup key={c.field}>
+						<TableRow>
+							<TableCell width={groupWidth}>
+								<CellText value={c.name} />
+							</TableCell>
+						</TableRow>
+						<TableRow>
+							{visibleChildren.map(child => (
+								<HeaderCell
+									key={child.field}
+									col={child}
+									sortValue={sort[child.field]}
+									sortIndex={sortKeys.indexOf(child.field)}
+									totalSorts={sortKeys.length}
+								/>
+							))}
+						</TableRow>
+					</TableGroup>,
+				)
+			} else {
+				header.push(
+					<HeaderCell
+						key={c.field}
+						col={c}
+						sortValue={sort[c.field]}
+						sortIndex={sortKeys.indexOf(c.field)}
+						totalSorts={sortKeys.length}
+					/>,
+				)
 			}
 		})
 
 		return header
-	}
+	}, [columns, sort, sortKeys])
 
 	return (
-		<TableRow width={width} height={height}>
-			{renderHeader()}
-		</TableRow>
+		<TableHead>
+			<TableRow width={width} height={height}>
+				{renderContent}
+			</TableRow>
+		</TableHead>
 	)
-}
+})
+
+const HeaderCell: FC<{ col: IColumn; sortValue: 'ASC' | 'DESC' | null; sortIndex: number; totalSorts: number }> = memo(
+	({ col, sortValue, sortIndex, totalSorts }) => {
+		const dispatch = useAppDispatch()
+
+		const handleSort = () => {
+			if (col.allowSort) dispatch(setSort(col.field))
+		}
+
+		return (
+			<TableCell width={col.width || ColWidth} isActive onClick={col.allowSort ? handleSort : undefined}>
+				<CellText value={col.name} />
+				{col.allowSort && (
+					<Badge color='primary' badgeContent={sortIndex + 1} invisible={totalSorts < 2 || sortIndex === -1}>
+						<SortUpIcon
+							fontSize={16}
+							fill={sortValue ? 'black' : '#adadad'}
+							transform={!sortValue || sortValue === 'ASC' ? '' : 'rotateX(180deg)'}
+							transition={'.2s all ease-in-out'}
+						/>
+					</Badge>
+				)}
+			</TableCell>
+		)
+	},
+)

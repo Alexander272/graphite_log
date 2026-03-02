@@ -7,7 +7,8 @@ export const API = {
 	table: {
 		base: '/graphite' as const,
 		unique: '/graphite/unique' as const,
-		purpose: (id: string) => `/graphite/${id}/purpose` as const,
+		purpose: `/graphite/purpose` as const,
+		// purpose: (id: string) => `/graphite/${id}/purpose` as const,
 		place: (id: string) => `/graphite/${id}/place` as const,
 		notes: (id: string) => `/graphite/${id}/notes` as const,
 	},

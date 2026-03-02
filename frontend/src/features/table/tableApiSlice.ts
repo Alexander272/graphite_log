@@ -47,6 +47,22 @@ const tableApiSlice = apiSlice.injectEndpoints({
 				}
 			},
 		}),
+		getTableItemByIds: builder.query<{ data: ITableItem[] }, string[]>({
+			query: ids => ({
+				url: `${API.table.base}/several`,
+				method: 'GET',
+				params: new URLSearchParams({ ids: ids.join(',') }),
+			}),
+			providesTags: [{ type: 'Table', id: 'ALL' }],
+			onQueryStarted: async (_arg, api) => {
+				try {
+					await api.queryFulfilled
+				} catch (error) {
+					const fetchError = (error as IBaseFetchError).error
+					toast.error(fetchError.data.message, { autoClose: false })
+				}
+			},
+		}),
 		getUniqueData: builder.query<{ data: string[] }, { field: string; realm: string }>({
 			query: req => ({
 				url: `${API.table.unique}/${req.field}`,
@@ -89,7 +105,7 @@ const tableApiSlice = apiSlice.injectEndpoints({
 
 		setPurpose: builder.mutation<null, ISetPurposeDTO>({
 			query: data => ({
-				url: API.table.purpose(data.id),
+				url: API.table.purpose,
 				method: 'PUT',
 				body: data,
 			}),
@@ -125,8 +141,10 @@ const tableApiSlice = apiSlice.injectEndpoints({
 
 export const {
 	useGetTableItemsQuery,
+	useLazyGetTableItemsQuery,
 	useGetTableItemByIdQuery,
 	useLazyGetTableItemByIdQuery,
+	useGetTableItemByIdsQuery,
 	useGetUniqueDataQuery,
 	useLazyGetUniqueDataQuery,
 	useCreateTableItemMutation,

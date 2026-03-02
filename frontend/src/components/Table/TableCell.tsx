@@ -7,7 +7,7 @@ type Props = {
 	colSpan?: number
 	rowSpan?: number
 	isActive?: boolean
-	onClick?: () => void
+	onClick?: (event: React.MouseEvent) => void
 }
 
 export const TableCell: FC<PropsWithChildren<Props>> = ({ children, width, isActive, onClick }) => {

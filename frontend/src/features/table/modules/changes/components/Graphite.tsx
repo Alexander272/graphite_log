@@ -59,19 +59,7 @@ export const Graphite: FC<Props> = ({ data }) => {
 								<TableRow key={item.id} sx={{ minHeight: 38, cursor: 'default' }}>
 									<TableCell width={160}>{dayjs(item.created).format('DD.MM.YYYY HH:mm')}</TableCell>
 									<TableCell width={430}>
-										{/* <CellText value={fields.join(', ')} /> */}
 										<Typography>{fields.join(', ')}</Typography>
-										{/* <Stack
-											my={0.5}
-											direction={'row'}
-											flexWrap={'wrap'}
-											gap={0.5}
-											justifyContent={'center'}
-										>
-											{fields.map(f => (
-												<Chip key={f} variant='outlined' label={f} />
-											))}
-										</Stack> */}
 									</TableCell>
 									<TableCell width={210}>{item.userName}</TableCell>
 									<TableCell width={50}>
