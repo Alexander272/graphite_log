@@ -27,6 +27,7 @@ func NewGraphiteRepo(db *sqlx.DB) *GraphiteRepo {
 type Graphite interface {
 	Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*models.Graphite, error)
 	GetById(ctx context.Context, req *models.GetGraphiteByIdDTO) (*models.Graphite, error)
+	GetByIds(ctx context.Context, req *models.GetGraphiteByIdsDTO) ([]*models.Graphite, error)
 	GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error)
 	GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error)
 	Create(ctx context.Context, dto *models.GraphiteDTO) error
@@ -42,6 +43,7 @@ type Graphite interface {
 
 func (r *GraphiteRepo) getColumnName(field string) string {
 	columns := map[string]string{
+		"id":              "id",
 		"dateOfReceipt":   "date_of_receipt",
 		"name":            "name",
 		"erpName":         "erp_name",
@@ -64,78 +66,185 @@ func (r *GraphiteRepo) getColumnName(field string) string {
 	return columns[field]
 }
 
+// func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*models.Graphite, error) {
+// 	params := []interface{}{req.RealmId}
+// 	count := 2
+
+// 	order := " ORDER BY "
+// 	for _, s := range req.Sort {
+// 		order += fmt.Sprintf("%s %s, ", r.getColumnName(s.Field), s.Type)
+// 	}
+// 	order += "row_num DESC, g.id"
+
+// 	filter := "WHERE realm_id=$1"
+// 	if len(req.Filters) > 0 {
+// 		filter += " AND "
+// 		filters := []string{}
+
+// 		for _, ns := range req.Filters {
+// 			for _, sv := range ns.Values {
+// 				filters = append(filters, getFilterLine(sv.CompareType, r.getColumnName(ns.Field), count))
+// 				if sv.CompareType == "in" {
+// 					params = append(params, pq.Array(strings.Split(sv.Value, "|")))
+// 					count++
+// 					// 	sv.Value = strings.ReplaceAll(sv.Value, ",", "|")
+// 				}
+// 				if sv.CompareType != "null" && sv.CompareType != "in" {
+// 					params = append(params, sv.Value)
+// 					count++
+// 				}
+// 			}
+// 		}
+// 		filter += strings.Join(filters, " AND ")
+// 	}
+
+// 	search := ""
+// 	if req.Search != nil {
+// 		search = " AND ("
+
+// 		list := []string{}
+// 		for _, f := range req.Search.Fields {
+// 			list = append(list, fmt.Sprintf("%s ILIKE '%%'||$%d||'%%'", r.getColumnName(f), count))
+// 		}
+// 		params = append(params, req.Search.Value)
+// 		count++
+// 		search += strings.Join(list, " OR ") + ")"
+// 	}
+
+// 	params = append(params, req.Page.Limit, req.Page.Offset)
+
+// 	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number,
+// 		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued,
+// 		COALESCE(extending, '') AS extending, COALESCE(issuance, '') AS issuance, COALESCE(issuance_dates, '{}') as issuance_dates,
+// 		COUNT(*) OVER() AS total
+// 		FROM %s AS g
+// 		LEFT JOIN LATERAL (SELECT string_agg(act, '; ' ORDER BY date_of_extending DESC) AS extending FROM %s WHERE graphite_id=g.id) AS e ON true
+// 		LEFT JOIN LATERAL (SELECT string_agg(CONCAT_WS(' ', CASE WHEN type='return' THEN 'Возвращен' ELSE 'Выдан' END ||
+// 			CASE WHEN amount=0 THEN '' ELSE CONCAT_WS(' ', 'о',amount,'кг') END,
+// 			CASE WHEN issuance_date>'2000-01-01'::DATE THEN to_char(issuance_date AT TIME ZONE 'Asia/Yekaterinburg', 'DD.MM.YYYY') ELSE NULL END,
+// 			'('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance,
+// 			array_agg(issuance_date ORDER BY issuance_date DESC) AS issuance_dates
+// 			FROM %s AS i INNER JOIN %s AS u ON user_id::text=u.sso_id
+// 			WHERE graphite_id=g.id) AS i ON true
+// 		%s%s%s LIMIT $%d OFFSET $%d`,
+// 		GraphiteTable, ExtendingTable, IssuanceTable, UserTable,
+// 		filter, search, order, count, count+1,
+// 	)
+// 	// logger.Debug("get graphite", logger.StringAttr("query", query))
+
+// 	tmp := []*pq_models.Graphite{}
+// 	if err := r.db.SelectContext(ctx, &tmp, query, params...); err != nil {
+// 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+// 	}
+
+//		data := []*models.Graphite{}
+//		for _, v := range tmp {
+//			data = append(data, v.ToModel())
+//		}
+//		return data, nil
+//	}
 func (r *GraphiteRepo) Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*models.Graphite, error) {
+	// 1. Инициализация параметров
 	params := []interface{}{req.RealmId}
-	count := 2
+	argIdx := 2
 
-	order := " ORDER BY "
-	for _, s := range req.Sort {
-		order += fmt.Sprintf("%s %s, ", r.getColumnName(s.Field), s.Type)
+	// 2. Сортировка
+	orderClause := ""
+	if len(req.Sort) > 0 {
+		var sortParts []string
+		for _, s := range req.Sort {
+			direction := "ASC"
+			if strings.ToUpper(s.Type) == "DESC" {
+				direction = "DESC"
+			}
+			sortParts = append(sortParts, fmt.Sprintf("%s %s", r.getColumnName(s.Field), direction))
+		}
+		orderClause = " ORDER BY " + strings.Join(sortParts, ", ") + ", row_num DESC, g.id"
+	} else {
+		orderClause = " ORDER BY row_num DESC, g.id"
 	}
-	order += "row_num DESC, g.id"
 
-	filter := "WHERE realm_id=$1"
+	// 3. Фильтрация
+	filterClause := " WHERE realm_id = $1"
 	if len(req.Filters) > 0 {
-		filter += " AND "
-		filters := []string{}
-
+		var filters []string
 		for _, ns := range req.Filters {
 			for _, sv := range ns.Values {
-				filters = append(filters, getFilterLine(sv.CompareType, r.getColumnName(ns.Field), count))
+				col := r.getColumnName(ns.Field)
+				filters = append(filters, getFilterLine(sv.CompareType, col, argIdx))
+
 				if sv.CompareType == "in" {
 					params = append(params, pq.Array(strings.Split(sv.Value, "|")))
-					count++
-					// 	sv.Value = strings.ReplaceAll(sv.Value, ",", "|")
-				}
-				if sv.CompareType != "null" && sv.CompareType != "in" {
+					argIdx++
+				} else if sv.CompareType != "null" {
 					params = append(params, sv.Value)
-					count++
+					argIdx++
 				}
 			}
 		}
-		filter += strings.Join(filters, " AND ")
+		filterClause += " AND " + strings.Join(filters, " AND ")
 	}
 
-	search := ""
-	if req.Search != nil {
-		search = " AND ("
-
-		list := []string{}
+	// 4. Поиск
+	searchClause := ""
+	if req.Search != nil && len(req.Search.Fields) > 0 {
+		var searchParts []string
 		for _, f := range req.Search.Fields {
-			list = append(list, fmt.Sprintf("%s ILIKE '%%'||$%d||'%%'", r.getColumnName(f), count))
+			searchParts = append(searchParts, fmt.Sprintf("%s ILIKE '%%'||$%d||'%%'", r.getColumnName(f), argIdx))
 		}
 		params = append(params, req.Search.Value)
-		count++
-		search += strings.Join(list, " OR ") + ")"
+		argIdx++
+		searchClause = " AND (" + strings.Join(searchParts, " OR ") + ")"
 	}
 
+	// 5. Пагинация
+	limitIdx := argIdx
+	offsetIdx := argIdx + 1
 	params = append(params, req.Page.Limit, req.Page.Offset)
 
-	query := fmt.Sprintf(`SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
-		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued,
-		COALESCE(extending, '') AS extending, COALESCE(issuance, '') AS issuance, COALESCE(issuance_dates, '{}') as issuance_dates,
-		COUNT(*) OVER() AS total 
-		FROM %s AS g
-		LEFT JOIN LATERAL (SELECT string_agg(act, '; ' ORDER BY date_of_extending DESC) AS extending FROM %s WHERE graphite_id=g.id) AS e ON true
-		LEFT JOIN LATERAL (SELECT string_agg(CONCAT_WS(' ', CASE WHEN type='return' THEN 'Возвращен' ELSE 'Выдан' END ||
-			CASE WHEN amount=0 THEN '' ELSE CONCAT_WS(' ', 'о',amount,'кг') END, 
-			CASE WHEN issuance_date>'2000-01-01'::DATE THEN to_char(issuance_date AT TIME ZONE 'Asia/Yekaterinburg', 'DD.MM.YYYY') ELSE NULL END, 
-			'('||last_name||')'), '; ' ORDER BY issuance_date DESC) AS issuance,
-			array_agg(issuance_date ORDER BY issuance_date DESC) AS issuance_dates
-			FROM %s AS i INNER JOIN %s AS u ON user_id::text=u.sso_id
-			WHERE graphite_id=g.id) AS i ON true
-		%s%s%s LIMIT $%d OFFSET $%d`,
+	// 6. SQL Запрос
+	// Используем конструкцию i.issuance_dates[1] если нужна только последняя дата
+	query := fmt.Sprintf(`
+        SELECT id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number,
+			document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued,
+            COALESCE(e.extending, '') as extending,
+            COALESCE(i.issuance, '') as issuance,
+            COALESCE(i.issuance_dates, '{}') as issuance_dates,
+            COUNT(*) OVER() AS total
+        FROM %s AS g
+        LEFT JOIN LATERAL (
+            SELECT string_agg(act, '; ' ORDER BY date_of_extending DESC) AS extending 
+            FROM %s 
+            WHERE graphite_id = g.id
+        ) AS e ON true
+        LEFT JOIN LATERAL (
+            SELECT 
+                string_agg(
+                    format('%%s%%s %%s (%%s)', 
+                        CASE WHEN type='return' THEN 'Возвращен' ELSE 'Выдан' END,
+                        CASE WHEN amount = 0 THEN '' ELSE 'о ' || amount || ' кг' END,
+                        CASE WHEN issuance_date > '2000-01-01' THEN to_char(issuance_date AT TIME ZONE 'Asia/Yekaterinburg', 'DD.MM.YYYY') ELSE '' END,
+                        u.last_name
+                    ), 
+                '; ' ORDER BY i.issuance_date DESC) AS issuance,
+                array_agg(i.issuance_date ORDER BY i.issuance_date DESC) AS issuance_dates
+            FROM %s AS i 
+            JOIN %s AS u ON i.user_id::text = u.sso_id
+            WHERE i.graphite_id = g.id
+        ) AS i ON true
+        %s %s %s 
+        LIMIT $%d OFFSET $%d`,
 		GraphiteTable, ExtendingTable, IssuanceTable, UserTable,
-		filter, search, order, count, count+1,
+		filterClause, searchClause, orderClause, limitIdx, offsetIdx,
 	)
-	// logger.Debug("get graphite", logger.StringAttr("query", query))
 
 	tmp := []*pq_models.Graphite{}
 	if err := r.db.SelectContext(ctx, &tmp, query, params...); err != nil {
-		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+		return nil, fmt.Errorf("failed to fetch graphite: %w", err)
 	}
 
-	data := []*models.Graphite{}
+	// Преобразование моделей
+	data := make([]*models.Graphite, 0, len(tmp))
 	for _, v := range tmp {
 		data = append(data, v.ToModel())
 	}
@@ -157,6 +266,23 @@ func (r *GraphiteRepo) GetById(ctx context.Context, req *models.GetGraphiteByIdD
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, models.ErrNoRows
 		}
+		return nil, fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return data, nil
+}
+
+func (r *GraphiteRepo) GetByIds(ctx context.Context, req *models.GetGraphiteByIdsDTO) ([]*models.Graphite, error) {
+	query := fmt.Sprintf(`SELECT id, realm_id, date_of_receipt, name, erp_name, supplier_batch, big_bag_number, registration_number, 
+		document, supplier, supplier_name, purpose, number_1c, act, production_date, place, notes, is_overdue, is_all_issued, 
+		COALESCE(issuance, '') AS issuance 
+		FROM %s AS g
+		LEFT JOIN LATERAL (SELECT COALESCE(issuance_date::text, '') AS issuance FROM %s WHERE graphite_id=g.id ORDER BY issuance_date DESC LIMIT 1) AS i ON TRUE
+		WHERE id=ANY($1) ORDER BY id`,
+		GraphiteTable, IssuanceTable,
+	)
+	data := []*models.Graphite{}
+
+	if err := r.db.SelectContext(ctx, &data, query, pq.Array(req.Ids)); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return data, nil
@@ -276,11 +402,11 @@ func (r *GraphiteRepo) SetIssued(ctx context.Context, dto *models.SetGraphiteIss
 }
 
 func (r *GraphiteRepo) SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error {
-	query := fmt.Sprintf(`UPDATE %s SET purpose=:purpose WHERE id=:id`,
+	query := fmt.Sprintf(`UPDATE %s SET purpose=$1 WHERE id=ANY($2::uuid[])`,
 		GraphiteTable,
 	)
 
-	if _, err := r.db.NamedExecContext(ctx, query, dto); err != nil {
+	if _, err := r.db.ExecContext(ctx, query, dto.Purpose, pq.Array(dto.Ids)); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
 	}
 	return nil

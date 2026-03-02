@@ -11,6 +11,10 @@ type GetGraphiteByIdDTO struct {
 	Id string `json:"id" db:"id" binding:"required"`
 }
 
+type GetGraphiteByIdsDTO struct {
+	Ids []string `json:"ids" binding:"required"`
+}
+
 type GetOverdueDTO struct {
 }
 
@@ -78,8 +82,8 @@ type SetGraphiteIssuedDTO struct {
 }
 
 type SetGraphitePurposeDTO struct {
-	Id       string `json:"id" db:"id" binding:"required"`
-	Purpose  string `json:"purpose" db:"purpose"`
+	Ids      []string `json:"ids" binding:"required"`
+	Purpose  string   `json:"purpose" db:"purpose"`
 	UserId   string
 	UserName string
 }
@@ -92,4 +96,55 @@ type SetGraphitePlaceDTO struct {
 type SetGraphiteNotesDTO struct {
 	Id    string `json:"id" db:"id" binding:"required"`
 	Notes string `json:"notes" db:"notes"`
+}
+
+type GraphiteBase struct {
+	DateOfReceipt  time.Time `json:"dateOfReceipt" db:"date_of_receipt"`
+	Name           string    `json:"name" db:"name"`
+	ErpName        string    `json:"erpName" db:"erp_name"`
+	SupplierBatch  string    `json:"supplierBatch" db:"supplier_batch"`
+	BigBagNumber   string    `json:"bigBagNumber" db:"big_bag_number"`
+	RegNumber      string    `json:"regNumber" db:"registration_number"`
+	Document       string    `json:"document" db:"document"`
+	Supplier       string    `json:"supplier" db:"supplier"`
+	SupplierName   string    `json:"supplierName" db:"supplier_name"`
+	Number1c       string    `json:"number1c" db:"number_1c"`
+	Act            string    `json:"act" db:"act"`
+	ProductionDate time.Time `json:"productionDate" db:"production_date"`
+	Notes          string    `json:"notes" db:"notes"`
+}
+
+func (g *Graphite) ToBase() *GraphiteBase {
+	return &GraphiteBase{
+		DateOfReceipt:  g.DateOfReceipt,
+		Name:           g.Name,
+		ErpName:        g.ErpName,
+		SupplierBatch:  g.SupplierBatch,
+		BigBagNumber:   g.BigBagNumber,
+		RegNumber:      g.RegNumber,
+		Document:       g.Document,
+		Supplier:       g.Supplier,
+		SupplierName:   g.SupplierName,
+		Number1c:       g.Number1c,
+		Act:            g.Act,
+		ProductionDate: g.ProductionDate,
+		Notes:          g.Notes,
+	}
+}
+func (g *GraphiteDTO) ToBase() *GraphiteBase {
+	return &GraphiteBase{
+		DateOfReceipt:  g.DateOfReceipt,
+		Name:           g.Name,
+		ErpName:        g.ErpName,
+		SupplierBatch:  g.SupplierBatch,
+		BigBagNumber:   g.BigBagNumber,
+		RegNumber:      g.RegNumber,
+		Document:       g.Document,
+		Supplier:       g.Supplier,
+		SupplierName:   g.SupplierName,
+		Number1c:       g.Number1c,
+		Act:            g.Act,
+		ProductionDate: g.ProductionDate,
+		Notes:          g.Notes,
+	}
 }

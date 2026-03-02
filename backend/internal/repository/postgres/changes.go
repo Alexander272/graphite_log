@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository/postgres/pq_models"
@@ -24,6 +25,7 @@ func NewChangesRepo(db *sqlx.DB) *ChangesRepo {
 type Changes interface {
 	Get(ctx context.Context, req *models.GetChangesDTO) ([]*models.Changes, error)
 	Create(ctx context.Context, dto *models.ChangesDTO) error
+	CreateSeveral(ctx context.Context, dto []*models.ChangesDTO) error
 }
 
 func (r *ChangesRepo) Get(ctx context.Context, req *models.GetChangesDTO) ([]*models.Changes, error) {
@@ -76,6 +78,49 @@ func (r *ChangesRepo) Create(ctx context.Context, dto *models.ChangesDTO) error 
 
 	if _, err := r.db.NamedExecContext(ctx, query, tmp); err != nil {
 		return fmt.Errorf("failed to execute query. error: %w", err)
+	}
+	return nil
+}
+
+func (r *ChangesRepo) CreateSeveral(ctx context.Context, dto []*models.ChangesDTO) error {
+	if len(dto) == 0 {
+		return nil
+	}
+
+	numFields := 8
+	args := make([]interface{}, 0, len(dto)*numFields)
+	values := make([]string, 0, len(dto))
+
+	for i, item := range dto {
+		if item.Id == "" {
+			item.Id = uuid.NewString()
+		}
+
+		offset := i * numFields
+		values = append(values, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			offset+1, offset+2, offset+3, offset+4, offset+5, offset+6, offset+7, offset+8))
+
+		args = append(args,
+			item.Id,
+			item.UserId,
+			item.UserName,
+			item.Section,
+			item.ValueId,
+			item.Original,
+			item.Changed,
+			pq.Array(item.ChangedFields),
+		)
+	}
+
+	// 3. Собираем запрос
+	query := fmt.Sprintf(
+		"INSERT INTO %s (id, user_id, user_name, section, value_id, original, changed, changed_fields) VALUES %s",
+		ChangedTable,
+		strings.Join(values, ","),
+	)
+
+	if _, err := r.db.ExecContext(ctx, query, args...); err != nil {
+		return fmt.Errorf("bulk insert failed: %w", err)
 	}
 	return nil
 }

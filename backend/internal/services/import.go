@@ -194,11 +194,13 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 				}
 
 				issuance[index] = append(issuance[index], &models.IssuanceForProdDTO{
-					IssuanceDate: issDate,
-					UserId:       user,
-					IsFull:       row[template.Place] == "",
-					Amount:       amount,
-					Type:         typeIss,
+					IssuanceBase: models.IssuanceBase{
+						IssuanceDate: issDate,
+						UserId:       user,
+						IsFull:       row[template.Place] == "",
+						Amount:       amount,
+						Type:         typeIss,
+					},
 				})
 			}
 		}
@@ -215,9 +217,11 @@ func (s *ImportService) Load(ctx context.Context, dto *models.ImportDTO) error {
 			actDate := time.Date(date.Year(), date.Month(), date.Day(), date.Hour(), 0, 0, 0, time.Now().Location())
 
 			extending[index] = &models.ExtendingDTO{
-				Act:    row[template.MarkOfExtending],
-				Date:   actDate,
-				Period: 24,
+				ExtendingBase: models.ExtendingBase{
+					Act:    row[template.MarkOfExtending],
+					Date:   actDate,
+					Period: 24,
+				},
 			}
 		}
 

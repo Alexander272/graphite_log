@@ -3,6 +3,7 @@ package graphite
 import (
 	"errors"
 	"net/http"
+	"strings"
 
 	"github.com/Alexander272/graphite_log/backend/internal/constants"
 	"github.com/Alexander272/graphite_log/backend/internal/models"
@@ -32,6 +33,7 @@ func Register(api *gin.RouterGroup, service services.Graphite, middleware *middl
 	graphite := api.Group("/graphite", middleware.CheckPermissions(constants.Graphite, constants.Read))
 	{
 		graphite.GET("", handler.get)
+		graphite.GET("/several", handler.getByIds)
 		graphite.GET("/:id", handler.getById)
 		graphite.GET("/unique/:field", handler.getUniqueData)
 
@@ -43,7 +45,7 @@ func Register(api *gin.RouterGroup, service services.Graphite, middleware *middl
 
 		purpose := graphite.Group("", middleware.CheckPermissions(constants.GraphitePurpose, constants.Write))
 		{
-			purpose.PUT("/:id/purpose", handler.setPurpose)
+			purpose.PUT("/purpose", handler.setPurpose)
 		}
 		place := graphite.Group("", middleware.CheckPermissions(constants.GraphitePlace, constants.Write))
 		{
@@ -94,6 +96,24 @@ func (h *Handler) getById(c *gin.Context) {
 			return
 		}
 
+		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
+		error_bot.Send(c, err.Error(), dto)
+		return
+	}
+	c.JSON(http.StatusOK, response.DataResponse{Data: data})
+}
+
+func (h *Handler) getByIds(c *gin.Context) {
+	tmpIds := c.Query("ids")
+	if tmpIds == "" {
+		response.NewErrorResponse(c, http.StatusBadRequest, "ids is empty", "Отправлены некорректные данные")
+		return
+	}
+	ids := strings.Split(tmpIds, ",")
+	dto := &models.GetGraphiteByIdsDTO{Ids: ids}
+
+	data, err := h.service.GetByIds(c, dto)
+	if err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())
 		error_bot.Send(c, err.Error(), dto)
 		return

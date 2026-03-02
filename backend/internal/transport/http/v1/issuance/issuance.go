@@ -157,12 +157,13 @@ func (h *Handler) update(c *gin.Context) {
 	}
 	user := u.(models.User)
 
-	dto := &models.IssuanceForProdDTO{UserId: user.Id, UserName: user.Name}
+	dto := &models.IssuanceForProdDTO{UserName: user.Name}
 	if err := c.BindJSON(dto); err != nil {
 		response.NewErrorResponse(c, http.StatusBadRequest, err.Error(), "Отправлены некорректные данные")
 		return
 	}
 	dto.Id = id
+	dto.UserId = user.Id
 
 	if err := h.service.Update(c, dto); err != nil {
 		response.NewErrorResponse(c, http.StatusInternalServerError, err.Error(), "Произошла ошибка: "+err.Error())

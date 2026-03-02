@@ -104,7 +104,7 @@ func (r *IssuanceRepo) CreateSeveral(ctx context.Context, dto []*models.Issuance
 
 func (r *IssuanceRepo) Update(ctx context.Context, dto *models.IssuanceForProdDTO) error {
 	query := fmt.Sprintf(`UPDATE %s SET graphite_id=:graphite_id, issuance_date=:issuance_date, 
-		user_id=:user_id, is_full=:is_full, amount=:amount, type=:type WHERE id=:id`,
+		is_full=:is_full, amount=:amount, type=:type WHERE id=:id`,
 		IssuanceTable,
 	)
 

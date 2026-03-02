@@ -126,8 +126,8 @@ func (s *IssuanceService) Update(ctx context.Context, dto *models.IssuanceForPro
 		UserName: dto.UserName,
 		Section:  "issuance",
 		ValueId:  dto.GraphiteId,
-		Original: cnd,
-		Changed:  dto,
+		Original: cnd.ToBase(),
+		Changed:  dto.ToBase(),
 	}
 	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err

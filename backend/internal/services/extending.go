@@ -82,8 +82,8 @@ func (s *ExtendingService) Update(ctx context.Context, dto *models.ExtendingDTO)
 		UserName: dto.UserName,
 		Section:  "extending",
 		ValueId:  dto.GraphiteId,
-		Original: cnd,
-		Changed:  dto,
+		Original: cnd.ToBase(),
+		Changed:  dto.ToBase(),
 	}
 	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err

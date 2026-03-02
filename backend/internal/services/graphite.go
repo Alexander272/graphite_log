@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository"
@@ -21,6 +22,7 @@ func NewGraphiteService(repo repository.Graphite, changes Changes) *GraphiteServ
 type Graphite interface {
 	Get(ctx context.Context, req *models.GetGraphiteDTO) ([]*models.Graphite, error)
 	GetById(ctx context.Context, req *models.GetGraphiteByIdDTO) (*models.Graphite, error)
+	GetByIds(ctx context.Context, req *models.GetGraphiteByIdsDTO) ([]*models.Graphite, error)
 	GetUniqueData(ctx context.Context, req *models.GetUniqueDTO) ([]string, error)
 	GetOverdue(ctx context.Context, req *models.GetOverdueDTO) ([]*models.Graphite, error)
 	Create(ctx context.Context, dto *models.GraphiteDTO) error
@@ -49,6 +51,14 @@ func (s *GraphiteService) GetById(ctx context.Context, req *models.GetGraphiteBy
 			return nil, err
 		}
 		return nil, fmt.Errorf("failed to get graphite by id. error: %w", err)
+	}
+	return data, nil
+}
+
+func (s *GraphiteService) GetByIds(ctx context.Context, req *models.GetGraphiteByIdsDTO) ([]*models.Graphite, error) {
+	data, err := s.repo.GetByIds(ctx, req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get graphites by ids. error: %w", err)
 	}
 	return data, nil
 }
@@ -95,8 +105,8 @@ func (s *GraphiteService) Update(ctx context.Context, dto *models.GraphiteDTO) e
 		UserName: dto.UserName,
 		Section:  "graphite",
 		ValueId:  dto.Id,
-		Original: cnd,
-		Changed:  dto,
+		Original: cnd.ToBase(),
+		Changed:  dto.ToBase(),
 	}
 	if err := s.changes.AddChange(ctx, changedDto); err != nil {
 		return err
@@ -116,24 +126,44 @@ func (s *GraphiteService) SetIssued(ctx context.Context, dto *models.SetGraphite
 }
 
 func (s *GraphiteService) SetPurpose(ctx context.Context, dto *models.SetGraphitePurposeDTO) error {
-	cnd, err := s.GetById(ctx, &models.GetGraphiteByIdDTO{Id: dto.Id})
+	cnd, err := s.GetByIds(ctx, &models.GetGraphiteByIdsDTO{Ids: dto.Ids})
 	if err != nil {
 		return err
 	}
 
-	if cnd.Purpose != "" {
-		changedDto := &models.NewChangeDTO{
-			UserId:   dto.UserId,
-			UserName: dto.UserName,
-			Section:  "purpose",
-			ValueId:  dto.Id,
-			Original: cnd.Purpose,
-			Changed:  dto.Purpose,
-		}
-		if err := s.changes.AddChange(ctx, changedDto); err != nil {
-			return err
+	slices.Sort(dto.Ids)
+
+	changes := make([]*models.NewChangeDTO, 0, len(dto.Ids))
+	for i, c := range cnd {
+		if c.Purpose != "" {
+			changedDto := &models.NewChangeDTO{
+				UserId:   dto.UserId,
+				UserName: dto.UserName,
+				Section:  "purpose",
+				ValueId:  dto.Ids[i],
+				Original: c.Purpose,
+				Changed:  dto.Purpose,
+			}
+			changes = append(changes, changedDto)
 		}
 	}
+	if err := s.changes.AddChanges(ctx, changes); err != nil {
+		return err
+	}
+
+	// if cnd.Purpose != "" {
+	// 	changedDto := &models.NewChangeDTO{
+	// 		UserId:   dto.UserId,
+	// 		UserName: dto.UserName,
+	// 		Section:  "purpose",
+	// 		ValueId:  dto.Id,
+	// 		Original: cnd.Purpose,
+	// 		Changed:  dto.Purpose,
+	// 	}
+	// 	if err := s.changes.AddChange(ctx, changedDto); err != nil {
+	// 		return err
+	// 	}
+	// }
 
 	if err := s.repo.SetPurpose(ctx, dto); err != nil {
 		return fmt.Errorf("failed to set graphite purpose. error: %w", err)

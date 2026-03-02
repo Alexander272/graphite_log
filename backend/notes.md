@@ -2,3 +2,5 @@ goose -dir internal/migrate/postgres/migrations postgres "postgresql://postgres:
 goose -dir internal/migrate/postgres/migrations create new_accepted_table sql
 scp -r ./dist administrator@route:/home/administrator/apps/graphite
 npx vite-bundle-visualizer
+
+export DOCKER_API_VERSION=1.44
