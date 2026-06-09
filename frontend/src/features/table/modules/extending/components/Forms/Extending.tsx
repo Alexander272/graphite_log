@@ -22,7 +22,7 @@ const defaultValues: IExtendingDTO = {
 	graphiteId: '',
 	act: '',
 	date: dayjs().toISOString(),
-	period: 0,
+	period: 12,
 }
 
 export const Extending: FC<Props> = ({ id }) => {

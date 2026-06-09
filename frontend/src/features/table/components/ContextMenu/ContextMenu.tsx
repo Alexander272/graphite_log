@@ -39,7 +39,8 @@ export const ContextMenu = () => {
 
 	// const create = [<CreateOnBase key={'CreateOnBase'} />]
 	const update = [
-		<MenuItem key={'Update'} onClick={contextHandler('UpdateTableItem')} disabled={data?.data.isIssued}>
+		// TODO убрал disabled={data?.data.isIssued} так как нужно поправить акты у уже выданного графита
+		<MenuItem key={'Update'} onClick={contextHandler('UpdateTableItem')}>
 			<ListItemIcon>
 				<EditDocIcon fontSize={20} fill={'#363636'} />
 			</ListItemIcon>
