@@ -32,11 +32,11 @@ func (r *RuleRepo) GetAll(ctx context.Context) ([]*models.Rule, error) {
 		RuleTable, RoleTable, RuleItemTable,
 	)
 
-	var Rule []*models.Rule
-	if err := r.db.SelectContext(ctx, &Rule, query); err != nil {
+	var data []*models.Rule
+	if err := r.db.SelectContext(ctx, &data, query); err != nil {
 		return nil, fmt.Errorf("failed to execute query. error: %w", err)
 	}
-	return Rule, nil
+	return data, nil
 }
 
 func (r *RuleRepo) Create(ctx context.Context, Rule *models.RuleDTO) error {

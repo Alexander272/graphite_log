@@ -44,7 +44,7 @@ func (r *IssuanceRepo) Get(ctx context.Context, req *models.GetIssuanceForProdDT
 
 func (r *IssuanceRepo) GetLast(ctx context.Context, req *models.GetIssuanceForProdDTO) (*models.IssuanceForProd, error) {
 	query := fmt.Sprintf(`SELECT id, graphite_id, issuance_date, user_id, is_full, amount, type FROM %s 
-		WHERE graphite_id=$1 ORDER BY issuance_date DESC LIMIT 1`,
+		WHERE graphite_id=$1 ORDER BY issuance_date DESC, created_at DESC LIMIT 1`,
 		IssuanceTable,
 	)
 	data := &models.IssuanceForProd{}

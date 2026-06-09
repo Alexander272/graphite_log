@@ -7,11 +7,11 @@ import (
 func getFilterLine(compare string, fieldName string, count int) string {
 	switch compare {
 	case "con":
-		return fmt.Sprintf("LOWER(%s) LIKE LOWER('%%'||$%d||'%%')", fieldName, count)
+		return fmt.Sprintf("%s ILIKE '%%'||$%d||'%%'", fieldName, count)
 	case "start":
-		return fmt.Sprintf("LOWER(%s) LIKE LOWER($%d||'%%')", fieldName, count)
+		return fmt.Sprintf("%s ILIKE $%d||'%%'", fieldName, count)
 	case "end":
-		return fmt.Sprintf("LOWER(%s) LIKE LOWER('%%'||$%d)", fieldName, count)
+		return fmt.Sprintf("%s ILIKE '%%'||$%d", fieldName, count)
 	case "like":
 		return fmt.Sprintf("LOWER(%s) = LOWER($%d)", fieldName, count)
 	case "nlike":

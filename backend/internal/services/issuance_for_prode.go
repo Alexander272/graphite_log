@@ -7,6 +7,7 @@ import (
 
 	"github.com/Alexander272/graphite_log/backend/internal/models"
 	"github.com/Alexander272/graphite_log/backend/internal/repository"
+	"github.com/Alexander272/graphite_log/backend/pkg/logger"
 )
 
 type IssuanceService struct {
@@ -70,6 +71,7 @@ func (s *IssuanceService) Create(ctx context.Context, dto *models.IssuanceForPro
 
 	// Проверяем возможность выполнения операции
 	if err := s.validateIssuance(cnd, dto); err != nil {
+		logger.Error("validate issuance error:", logger.ErrAttr(err))
 		return err
 	}
 
@@ -98,7 +100,7 @@ func (s *IssuanceService) validateIssuance(current *models.IssuanceForProd, newD
 	}
 
 	// Если предыдущая была полной выдачей и новая - не возврат - запрещаем
-	if current.IsFull && newDto.Type != "return" {
+	if current.Type != "return" && current.IsFull && newDto.Type != "return" {
 		return models.ErrWasIssued
 	}
 	return nil

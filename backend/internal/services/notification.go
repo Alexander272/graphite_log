@@ -79,6 +79,10 @@ func (s *NotificationService) SendOverdue() error {
 
 		table := []string{tableHead, tableAlign}
 
+		if len(dataByRealm[u.RealmId]) == 0 {
+			continue
+		}
+
 		for _, g := range dataByRealm[u.RealmId] {
 			expiryDate := g.ProductionDate.AddDate(0, g.ExpiresIn, 0)
 			if g.DateOfExtending.Year() > 2000 {
